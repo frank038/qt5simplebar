@@ -17,5 +17,5 @@ The pictures below are self-explanatory.
 Whit compositing on:
 ![My image](https://github.com/frank038/qt5simplebar/blob/main/Screenshot1.png)
 
-Whit no compositing:
+Whit no compositing and in reverse order:
 ![My image](https://github.com/frank038/qt5simplebar/blob/main/Screenshot2.png)
