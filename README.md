@@ -1,4 +1,5 @@
 # qt5simplebar
+V 1.0
 A simple dock with menu and calendar.
 
 Free to use and modify.
