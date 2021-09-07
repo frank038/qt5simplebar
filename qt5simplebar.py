@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+#### v 1.0
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -266,6 +266,21 @@ class MainWin(QtWidgets.QMainWindow):
         # calendar list events
         self.list_events = list_events_all
     
+    # close all the menu if the bar is selected
+    def mousePressEvent(self, event):
+        ## for the calendar window
+        if self.cw_is_shown:
+            self.cw_is_shown.close()
+            self.cw_is_shown = None
+        # for the menu window
+        if self.mw_is_shown:
+            self.mw_is_shown.close()
+            self.mw_is_shown = None
+        # for the exit window
+        if self.cwin_is_shown:
+            self.cwin_is_shown.close()
+            self.cwin_is_shown = None
+    
     #
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
@@ -342,13 +357,14 @@ class menuWin(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(menuWin, self).__init__(parent)
         self.window = window
+        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowDoesNotAcceptFocus)
         #######
         self.mainBox = QtWidgets.QHBoxLayout()
         self.setLayout(self.mainBox)
         #
         win_height = self.window.size().height()
-        sw = 800
+        sw = menu_width
         sh = 200
         if menu_left:
             sx = 0
@@ -399,6 +415,17 @@ class menuWin(QtWidgets.QWidget):
         self.lbox.addWidget(self.listWidget)
         #
         self.listWidget.sortItems(QtCore.Qt.AscendingOrder)
+        ########### highlight
+        h_palette = self.palette().color(QtGui.QPalette.Highlight)
+        red =  h_palette.red()
+        green = h_palette.green()
+        blue = h_palette.blue()
+        h_p = "rgb({},{},{})".format(red,green,blue)
+        csaa = ("QListWidget::item:hover {")
+        csab = ("background-color: {};".format(h_p))
+        csac = ("}")
+        csa = csaa+csab+csac
+        self.listWidget.setStyleSheet(csa)
         ###########
         cssa = ("QScrollBar:vertical {"
     "border: 0px solid #999999;"
@@ -440,6 +467,18 @@ class menuWin(QtWidgets.QWidget):
         self.pref = QtWidgets.QPushButton("Bookmarks")
         self.pref.setIcon(QtGui.QIcon("icons/bookmark.svg"))
         self.pref.setFlat(True)
+        ##########
+        h_palette = self.palette().color(QtGui.QPalette.Mid)
+        red =  h_palette.red()
+        green = h_palette.green()
+        blue = h_palette.blue()
+        h_p = "rgb({},{},{})".format(red,green,blue)
+        csaa = ("QPushButton::hover:!pressed { border: none;")
+        csab = ("background-color: {};".format(h_p))
+        csac = ("border-radius: 3px;}")
+        csa = csaa+csab+csac
+        self.pref.setStyleSheet(csa)
+        ###########
         self.pref.clicked.connect(self.on_pref_clicked)
         self.rbox.addWidget(self.pref, alignment=QtCore.Qt.AlignLeft)
         #
@@ -539,6 +578,18 @@ class menuWin(QtWidgets.QWidget):
             btn = QtWidgets.QPushButton(el)
             btn.setIcon(QtGui.QIcon("icons/{}".format(el+".svg")))
             btn.setFlat(True)
+            ##########
+            h_palette = self.palette().color(QtGui.QPalette.Mid)
+            red =  h_palette.red()
+            green = h_palette.green()
+            blue = h_palette.blue()
+            h_p = "rgb({},{},{})".format(red,green,blue)
+            csaa = ("QPushButton::hover:!pressed { border: none;")
+            csab = ("background-color: {};".format(h_p))
+            csac = ("border-radius: 3px;}")
+            csa = csaa+csab+csac
+            btn.setStyleSheet(csa)
+            ##########
             self.rboxBtn.addWidget(btn, alignment=QtCore.Qt.AlignLeft)
             btn.clicked.connect(self.on_btn_clicked)
             
@@ -562,7 +613,7 @@ class menuWin(QtWidgets.QWidget):
                 litem = QtWidgets.QListWidgetItem(icon, el[0])
                 # set the exec name as property
                 litem.exec_n = el[1]
-                litem.setToolTip(el[3])
+                # litem.setToolTip(el[3])
                 self.listWidget.addItem(litem)
                 self.listWidget.itemClicked.connect(self.listwidgetclicked)
                 #
@@ -637,7 +688,7 @@ class menuWin(QtWidgets.QWidget):
             ICON = el[0].strip("\n")
             NAME = el[1].strip("\n")
             EXEC = el[2].strip("\n")
-            TOOLTIP = el[3].strip("\n")
+            # TOOLTIP = el[3].strip("\n")
             FILENAME = el[4].strip("\n")
             #
             exe_path = sh_which(EXEC.split(" ")[0])
@@ -651,7 +702,7 @@ class menuWin(QtWidgets.QWidget):
                         icon = QtGui.QIcon("icons/none.svg")
                 litem = QtWidgets.QListWidgetItem(icon, NAME)
                 litem.exec_n = EXEC
-                litem.setToolTip(TOOLTIP)
+                # litem.setToolTip(TOOLTIP)
                 litem.file_name = FILENAME
                 self.listWidget.addItem(litem)
                 self.listWidget.itemClicked.connect(self.listwidgetclicked)
