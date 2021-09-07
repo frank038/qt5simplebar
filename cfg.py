@@ -2,6 +2,8 @@
 bar_size=32
 # 1 left - 0 right
 menu_left=1
+# menu width
+menu_width=800
 # to use with a compositor enabled: 0 no - 1 yes
 with_compositor=0
 # 
