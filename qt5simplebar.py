@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.3
+#### v 1.3a
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -853,7 +853,7 @@ class calendarWin(QtWidgets.QWidget):
         #
         cwWidth = self.width()
         cwHeight = self.height()
-        cwX = (WINW-cwWidth)/2
+        cwX = int((WINW-cwWidth)/2)
         win_height = self.window.size().height()
         cwY = win_height
         if not with_compositor:
