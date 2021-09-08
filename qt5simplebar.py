@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.2
+#### v 1.3
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -610,6 +610,7 @@ class menuWin(QtWidgets.QWidget):
                 litem = QtWidgets.QListWidgetItem(icon, el[0])
                 # set the exec name as property
                 litem.exec_n = el[1]
+                litem.setToolTip(el[3])
                 self.listWidget.addItem(litem)
                 self.listWidget.itemClicked.connect(self.listwidgetclicked)
                 #
@@ -687,6 +688,7 @@ class menuWin(QtWidgets.QWidget):
             ICON = el[0].strip("\n")
             NAME = el[1].strip("\n")
             EXEC = el[2].strip("\n")
+            TOOLTIP = el[3].strip("\n")
             FILENAME = el[4].strip("\n")
             #
             exe_path = sh_which(EXEC.split(" ")[0])
@@ -700,6 +702,7 @@ class menuWin(QtWidgets.QWidget):
                         icon = QtGui.QIcon("icons/none.svg")
                 litem = QtWidgets.QListWidgetItem(icon, NAME)
                 litem.exec_n = EXEC
+                litem.setToolTip(TOOLTIP)
                 litem.file_name = FILENAME
                 self.listWidget.addItem(litem)
                 self.listWidget.itemClicked.connect(self.listwidgetclicked)
