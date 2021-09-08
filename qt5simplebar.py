@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.1
+#### v 1.2
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -368,8 +368,8 @@ class menuWin(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(menuWin, self).__init__(parent)
         self.window = window
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowDoesNotAcceptFocus)
-        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
+        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowDoesNotAcceptFocus)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
         ####### 
         self.mainBox = QtWidgets.QHBoxLayout()
         self.setLayout(self.mainBox)
@@ -562,11 +562,6 @@ class menuWin(QtWidgets.QWidget):
                             self.listWidget.itemClicked.connect(self.listwidgetclicked)
         else:
             self.listWidget.clear()
-    
-    #
-    @staticmethod
-    def on_populate_menu():
-        self.populate_menu()
     
     def populate_menu(self):
         # remove all widgets
@@ -1181,7 +1176,6 @@ if __name__ == '__main__':
         Missed = []
         #
         on_pop_menu(app_dirs_system, app_dirs_user)
-        menuWin().populate_menu()
     
     # check for changes in the application directories
     fPath = app_dirs_system + app_dirs_user
