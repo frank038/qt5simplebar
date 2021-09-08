@@ -1,7 +1,13 @@
 # the height of the bar (it depends also on the font size)
 bar_size=32
+# use stalonetray as system tray: 0 no - 1 yes
+use_stalonetray = 0
+# the icon size in the tray
+tray_icon_size = bar_size
+# from right to left
+tray_offset = 300
 # 1 left - 0 right
-menu_left=1
+menu_left=0
 # menu width
 menu_width=800
 # to use with a compositor enabled: 0 no - 1 yes
@@ -37,7 +43,7 @@ calendar_label_font_color=""
 #
 appointment_char="✔"
 #
-shutdown_command="shutdown -P"
+shutdown_command="shutdown -P now"
 #
 restart_command="shutdown -r"
 #

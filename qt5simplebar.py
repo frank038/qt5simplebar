@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-#### v 1.0
+#### v 1.1
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
 from Xlib.display import Display
+from Xlib import X
 import datetime
 from cfg import *
 sys.path.append("modules")
@@ -22,7 +23,7 @@ class sEvent:
     DTSTART=None
 
 list_events_all = []
-# put all the events from the file in self.list_events
+#
 def get_events():
     _events = None
     if os.path.exists(fopen):
@@ -160,12 +161,15 @@ on_pop_menu(app_dirs_user, app_dirs_system)
 #############
 
 class showDialog(QtWidgets.QDialog):
-    def __init__(self, lcontent, parent):
+    def __init__(self, dtype, lcontent, parent):
         super().__init__(parent)
         
         self.setWindowTitle("Info")
-
-        QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        
+        if dtype == 1:
+            QBtn = QtWidgets.QDialogButtonBox.Ok
+        elif dtype == 2:
+            QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
 
         self.buttonBox = QtWidgets.QDialogButtonBox(QBtn)
         self.buttonBox.accepted.connect(self.accept)
@@ -177,9 +181,13 @@ class showDialog(QtWidgets.QDialog):
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
         
+        # geometry of the main window
         qr = self.frameGeometry()
+        # center point of screen
         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
+        # move rectangle's center point to screen's center point
         qr.moveCenter(cp)
+        # top left of rectangle becomes top left of window centering it
         self.move(qr.topLeft())
 
 
@@ -196,7 +204,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.widget.setContentsMargins(0, 0, 0, 0)
         self.widget.setLayout(self.gbox)
         self.setCentralWidget(self.widget)
-        ####### box di sinistra
+        ####### 
         self.abox = QtWidgets.QHBoxLayout()
         self.abox.setContentsMargins(10,0,0,0)
         self.gbox.addLayout(self.abox, 0,0)
@@ -205,8 +213,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.mbutton.setIcon(QtGui.QIcon("icons/menu.png"))
         self.btn_style_sheet(self.mbutton)
         self.mbutton.clicked.connect(self.on_click)
-        
-        ###### box di centro
+        ###### 
         self.cbox = QtWidgets.QHBoxLayout()
         self.cbox.setContentsMargins(0,0,0,0)
         self.gbox.addLayout(self.cbox, 0,5)
@@ -230,11 +237,8 @@ class MainWin(QtWidgets.QMainWindow):
         timer.start(60 * 1000)
         
         self.tlabel.setContentsMargins(0,0,0,0)
-        
         self.tlabel.mousePressEvent = self.on_tlabel
-        
         ######### box di destra
-        
         self.zbox = QtWidgets.QHBoxLayout()
         self.zbox.setContentsMargins(0,0,10,0)
         orSpacer2 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum) 
@@ -243,6 +247,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.ebutton = QtWidgets.QPushButton(self, flat=True)
         self.ebutton.setIcon(QtGui.QIcon("icons/user.png"))
         self.ebutton.clicked.connect(self.on_close)
+        # set the style
         self.btn_style_sheet(self.ebutton)
         #
         if menu_left:
@@ -262,7 +267,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.mw_is_shown = None
         # for the exit window
         self.cwin_is_shown = None
-        
+        #
         # calendar list events
         self.list_events = list_events_all
     
@@ -281,7 +286,6 @@ class MainWin(QtWidgets.QMainWindow):
             self.cwin_is_shown.close()
             self.cwin_is_shown = None
     
-    #
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
         pix = QtGui.QPixmap("icons/left.png")
@@ -289,7 +293,6 @@ class MainWin(QtWidgets.QMainWindow):
         pix = QtGui.QPixmap("icons/right.png")
         painter.drawPixmap(WINW-10,0, pix)
         painter.end()
-    
     
     
     # label time    
@@ -327,10 +330,17 @@ class MainWin(QtWidgets.QMainWindow):
     
     def contextMenuEvent(self, event):
         contextMenu = QtWidgets.QMenu(self)
+        reloadAct = contextMenu.addAction("Reload")
         quitAct = contextMenu.addAction("Quit")
         action = contextMenu.exec_(self.mapToGlobal(event.pos()))
         if action == quitAct:
             self.close()
+        elif action == reloadAct:
+            self.restart()
+            
+    def restart(self):
+        QtCore.QCoreApplication.quit()
+        status = QtCore.QProcess.startDetached(sys.executable, sys.argv)
     
     # click on mbutton
     def on_click(self):
@@ -352,14 +362,15 @@ class MainWin(QtWidgets.QMainWindow):
         cwin = closeWin(self)
         self.cwin_is_shown = cwin
     
+
 # menu
 class menuWin(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(menuWin, self).__init__(parent)
         self.window = window
-        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowDoesNotAcceptFocus)
-        #######
+        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
+        ####### 
         self.mainBox = QtWidgets.QHBoxLayout()
         self.setLayout(self.mainBox)
         #
@@ -381,6 +392,7 @@ class menuWin(QtWidgets.QWidget):
         self.setGeometry(sx,sy,sw,sh)
         #
         self.hbox = QtWidgets.QHBoxLayout()
+        # 
         if with_compositor:
             self.frame=QtWidgets.QFrame(self)
             self.frame.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -401,6 +413,7 @@ class menuWin(QtWidgets.QWidget):
                         offset=QtCore.QPointF(-5, 5)
                     )
             self.setGraphicsEffect(shadow_effect)
+            #
             self.frame.setLayout(self.hbox)
         else:
             self.mainBox.setContentsMargins(2,2,2,2)
@@ -413,16 +426,9 @@ class menuWin(QtWidgets.QWidget):
         #
         self.listWidget = QtWidgets.QListWidget(self)
         self.lbox.addWidget(self.listWidget)
-        #
-        self.listWidget.sortItems(QtCore.Qt.AscendingOrder)
-        ########### highlight
-        h_palette = self.palette().color(QtGui.QPalette.Highlight)
-        red =  h_palette.red()
-        green = h_palette.green()
-        blue = h_palette.blue()
-        h_p = "rgb({},{},{})".format(red,green,blue)
+        hpalette = self.palette().highlight().color().name()
         csaa = ("QListWidget::item:hover {")
-        csab = ("background-color: {};".format(h_p))
+        csab = ("background-color: {};".format(hpalette))
         csac = ("}")
         csa = csaa+csab+csac
         self.listWidget.setStyleSheet(csa)
@@ -468,13 +474,9 @@ class menuWin(QtWidgets.QWidget):
         self.pref.setIcon(QtGui.QIcon("icons/bookmark.svg"))
         self.pref.setFlat(True)
         ##########
-        h_palette = self.palette().color(QtGui.QPalette.Mid)
-        red =  h_palette.red()
-        green = h_palette.green()
-        blue = h_palette.blue()
-        h_p = "rgb({},{},{})".format(red,green,blue)
+        hpalette = self.palette().mid().color().name()
         csaa = ("QPushButton::hover:!pressed { border: none;")
-        csab = ("background-color: {};".format(h_p))
+        csab = ("background-color: {};".format(hpalette))
         csac = ("border-radius: 3px;}")
         csa = csaa+csab+csac
         self.pref.setStyleSheet(csa)
@@ -553,6 +555,7 @@ class menuWin(QtWidgets.QWidget):
                             if not icon.name():
                                 icon = QtGui.QIcon("icons/none.svg")
                             litem = QtWidgets.QListWidgetItem(icon, el[0])
+                            # set the exec name as property
                             litem.exec_n = el[1]
                             litem.setToolTip(el[3])
                             self.listWidget.addItem(litem)
@@ -566,6 +569,7 @@ class menuWin(QtWidgets.QWidget):
         self.populate_menu()
     
     def populate_menu(self):
+        # remove all widgets
         for i in reversed(range(self.rboxBtn.count())): 
             self.rboxBtn.itemAt(i).widget().deleteLater()
         #
@@ -579,13 +583,9 @@ class menuWin(QtWidgets.QWidget):
             btn.setIcon(QtGui.QIcon("icons/{}".format(el+".svg")))
             btn.setFlat(True)
             ##########
-            h_palette = self.palette().color(QtGui.QPalette.Mid)
-            red =  h_palette.red()
-            green = h_palette.green()
-            blue = h_palette.blue()
-            h_p = "rgb({},{},{})".format(red,green,blue)
+            hpalette = self.palette().mid().color().name()
             csaa = ("QPushButton::hover:!pressed { border: none;")
-            csab = ("background-color: {};".format(h_p))
+            csab = ("background-color: {};".format(hpalette))
             csac = ("border-radius: 3px;}")
             csa = csaa+csab+csac
             btn.setStyleSheet(csa)
@@ -601,9 +601,11 @@ class menuWin(QtWidgets.QWidget):
         cat_list = globals()[cat_name]
         self.listWidget.clear()
         for el in cat_list:
+            # 0 name - 1 executable - 2 icon - 3 comment
             exe_path = sh_which(el[1].split(" ")[0])
             file_info = QtCore.QFileInfo(exe_path)
             if file_info.exists():
+                # set the full path first
                 if os.path.exists(el[2]):
                     icon = QtGui.QIcon(el[2])
                 else:
@@ -613,7 +615,6 @@ class menuWin(QtWidgets.QWidget):
                 litem = QtWidgets.QListWidgetItem(icon, el[0])
                 # set the exec name as property
                 litem.exec_n = el[1]
-                # litem.setToolTip(el[3])
                 self.listWidget.addItem(litem)
                 self.listWidget.itemClicked.connect(self.listwidgetclicked)
                 #
@@ -627,11 +628,14 @@ class menuWin(QtWidgets.QWidget):
         if action == item_b:
             item_idx = self.listWidget.indexAt(QPos)
             _item = self.listWidget.itemFromIndex(item_idx)
+            # check if a bookmark is already present
             pret = 1
             pret = self.check_bookmarks(_item)
             if pret == 1:
+                #
                 new_book = str(int(time.time()))
                 icon_name = _item.icon().name()
+                # da fare: trovare path tra le liste dei programmi
                 if not icon_name:
                     icon_name = "none"
                 # ICON - NAME - EXEC - TOOLTIP
@@ -688,7 +692,6 @@ class menuWin(QtWidgets.QWidget):
             ICON = el[0].strip("\n")
             NAME = el[1].strip("\n")
             EXEC = el[2].strip("\n")
-            # TOOLTIP = el[3].strip("\n")
             FILENAME = el[4].strip("\n")
             #
             exe_path = sh_which(EXEC.split(" ")[0])
@@ -702,7 +705,6 @@ class menuWin(QtWidgets.QWidget):
                         icon = QtGui.QIcon("icons/none.svg")
                 litem = QtWidgets.QListWidgetItem(icon, NAME)
                 litem.exec_n = EXEC
-                # litem.setToolTip(TOOLTIP)
                 litem.file_name = FILENAME
                 self.listWidget.addItem(litem)
                 self.listWidget.itemClicked.connect(self.listwidgetclicked)
@@ -733,7 +735,7 @@ class calendarWin(QtWidgets.QWidget):
         super(calendarWin, self).__init__(parent)
         self.window = window
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowDoesNotAcceptFocus)
-        ####### 
+        ####### box 
         mainBox = QtWidgets.QHBoxLayout()
         self.setLayout(mainBox)
         ## 
@@ -757,7 +759,7 @@ class calendarWin(QtWidgets.QWidget):
             self.hbox.setContentsMargins(2,2,2,2)
             mainBox.setContentsMargins(0,0,0,0)
         
-        #### box
+        #### 
         self.vbox_1 = QtWidgets.QVBoxLayout()
         self.vbox_1.setContentsMargins(0,0,0,0)
         self.hbox.addLayout(self.vbox_1)
@@ -766,7 +768,6 @@ class calendarWin(QtWidgets.QWidget):
         self.widget = QtWidgets.QWidget()
         self.vbox = QtWidgets.QVBoxLayout()
         self.widget.setLayout(self.vbox)
-        
         # 
         self.ldatebox = QtWidgets.QHBoxLayout()
         self.ldatebox.setContentsMargins(0,0,0,0)
@@ -774,6 +775,7 @@ class calendarWin(QtWidgets.QWidget):
         #
         tomonth = datetime.datetime.now().strftime("%B")
         toyear = str(datetime.datetime.now().year)
+        #
         self.mlabel = QtWidgets.QLabel(tomonth+" "+toyear)
         self.mlabel.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.mlabel.setAlignment(QtCore.Qt.AlignCenter)
@@ -784,14 +786,13 @@ class calendarWin(QtWidgets.QWidget):
         #
         self.nmonth = QtWidgets.QPushButton()
         self.nmonth.setIcon(QtGui.QIcon("icons/go-next.png"))
-        
+        #
         self.pmonth.clicked.connect(self.on_prev_month)
         self.nmonth.clicked.connect(self.on_next_month)
         #
         self.ldatebox.addWidget(self.pmonth)
         self.ldatebox.addWidget(self.mlabel)
         self.ldatebox.addWidget(self.nmonth)
-
         #
         self.scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -835,6 +836,7 @@ class calendarWin(QtWidgets.QWidget):
             ttime = ("{}:{}".format(tdata[9:11], tdata[11:13]))
             tdate = QtCore.QDate.fromString(ev.DTSTART[0:8], 'yyyyMMdd')
             l_e.append((tdate, ttime+" "+ev.SUMMARY))
+        #
         l_e.sort()
         ###
         self.calendar = Calendar(self, l_e, self.vbox)
@@ -896,6 +898,7 @@ class calendarWin(QtWidgets.QWidget):
             selectedMonth = 0
         if (thisMonth == selectedMonth+1) and (thisYear == selectedYear):
             thisDay = QtCore.QDate().currentDate().day()
+        #
         self.calendar.setSelectedDate(QtCore.QDate(selectedYear, selectedMonth+1, thisDay))
         #
         nmonth2 = datetime.datetime.strptime(str(selectedMonth+1), '%m')
@@ -910,15 +913,15 @@ class ClickLabel(QtWidgets.QLabel):
         self.clicked.emit()
         QtWidgets.QLabel.mousePressEvent(self, event)      
 
-# QCalendarWidget Class
+# 
 class Calendar(QtWidgets.QCalendarWidget):
   
+    # constructor
     def __init__(self, parent=None, c_dict=None, vbox=None):
         super(Calendar, self).__init__(parent)
         self.events = c_dict
         self.cvbox = vbox
         self.color3 = QtGui.QColor(calendar_appointment_day_color)
-        #
         # day in the month
         self.clicked.connect(self.showDate)
         # year or month changed by user
@@ -929,6 +932,7 @@ class Calendar(QtWidgets.QCalendarWidget):
         #
         self.vw = self.findChild(QtWidgets.QTableView)
         self.vw.viewport().installEventFilter(self)
+        #
     
     #
     def popCalEv(self, date):
@@ -982,6 +986,7 @@ class closeWin(QtWidgets.QWidget):
         super(closeWin, self).__init__(parent)
         self.window = window
         #
+        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool)
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowDoesNotAcceptFocus)
         #
         self.hbox = QtWidgets.QVBoxLayout()
@@ -1064,7 +1069,7 @@ class closeWin(QtWidgets.QWidget):
     def on_shut(self):
         self.close()
         self.window.cwin_is_shown = None
-        dlg = showDialog("Shutdown?", self)
+        dlg = showDialog(2, "Shutdown?", self)
         result = dlg.exec_()
         ret = 0
         if result == QtWidgets.QDialog.Accepted:
@@ -1076,13 +1081,13 @@ class closeWin(QtWidgets.QWidget):
         if ret:
             self.process = QtCore.QProcess()
             self.process.finished.connect(self.process_finished)
-            self.process.start(shutdown_command, [])
+            self.process.start(shutdown_command)
     
     #
     def on_rest(self):
         self.close()
         self.window.cwin_is_shown = None
-        dlg = showDialog("Restart?", self)
+        dlg = showDialog(2, "Restart?", self)
         result = dlg.exec_()
         ret = 0
         if result == QtWidgets.QDialog.Accepted:
@@ -1094,13 +1099,13 @@ class closeWin(QtWidgets.QWidget):
         if ret:
             self.process = QtCore.QProcess()
             self.process.finished.connect(self.process_finished)
-            self.process.start(shutdown_command, [])
+            self.process.start(shutdown_command)
     
     #
     def on_logo(self):
         self.close()
         self.window.cwin_is_shown = None
-        dlg = showDialog("Logout?", self)
+        dlg = showDialog(2, "Logout?", self)
         result = dlg.exec_()
         ret = 0
         if result == QtWidgets.QDialog.Accepted:
@@ -1112,7 +1117,7 @@ class closeWin(QtWidgets.QWidget):
         if ret:
             self.process = QtCore.QProcess()
             self.process.finished.connect(self.process_finished)
-            self.process.start(shutdown_command, [])
+            self.process.start(shutdown_command)
 
 
 ################
@@ -1123,6 +1128,7 @@ if __name__ == '__main__':
     ####
     screen = app.primaryScreen()
     size = screen.size()
+    ####
     WINW = size.width()
     WINH = bar_size
     window.setGeometry(0, 0, WINW, WINH)
@@ -1134,9 +1140,12 @@ if __name__ == '__main__':
     windowID = int(window.winId())
     _display = Display()
     _window = _display.create_resource_object('window', windowID)
-    _window.change_property(_display.intern_atom('_NET_WM_STRUT'),
-                                _display.intern_atom('CARDINAL'),
-                                32, [0, 0, WINH, 0])
+    x = 0
+    _window.change_property(_display.intern_atom('_NET_WM_STRUT_PARTIAL'),
+                           _display.intern_atom('CARDINAL'), 32,
+                           [0, 0, WINH, 0, 0, 0, 0, 0, x, x+WINW-1, 0, 0],
+                           X.PropModeReplace)
+    #
     _display.sync()
     # set new style globally
     if theme_style:
@@ -1146,7 +1155,6 @@ if __name__ == '__main__':
     if icon_theme:
         QtGui.QIcon.setThemeName(icon_theme)
     #
-    
     def directory_changed(edir):
         #
         global Development
@@ -1189,6 +1197,34 @@ if __name__ == '__main__':
         fileSystemWatcher.addPath(epath)
         fileSystemWatcher.fileChanged.connect(file_changed)
     #
-    sys.exit(app.exec_())
+    ##### stalonetray
+    if use_stalonetray:
+        tray = "stalonetray"
+        hpalette = window.palette().window().color().name()
+        if WINH < int(tray_icon_size):
+            tray_icon_size = str(bar_size)
+            tray_y_offset = 0
+        elif WINH > int(tray_icon_size):
+            tray_icon_size = str(tray_icon_size)
+            tray_y_offset = int((int(WINH) - int(tray_icon_size)) / 2)
+        else:
+            tray_y_offset = 0
+            tray_icon_size = str(tray_icon_size)
+        p = QtCore.QProcess()
+        #
+        def start_tray():
+            try:
+                p.start(tray, ["--skip-taskbar", "-geometry", "+{}+{}".format(WINW-tray_offset, tray_y_offset), "--icon-size", tray_icon_size, "--sticky", "--grow-gravity", "E", "--icon-gravity", "W", "--window-layer", "top", "--background", hpalette])
+            except Exception as E:
+                dlg = showDialog(1, "Something happend with the tray.\n{}".format(str(E)), window)
+                result = dlg.exec_()
+                dlg.close()
+        start_tray()
+        ret = app.exec_()
+        p.terminate()
+        time.sleep(0.5)
+        sys.exit(ret)
+    else:
+        sys.exit(app.exec_())
     
 ###################
