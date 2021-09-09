@@ -14,7 +14,7 @@ Require:
 
 Some options can be changed in the cfg.py config file.
 
-The file 'delete_me' in the bookmark folder must be deleted before launching the program.
+The file 'delete_me' in the bookmarks folder must be deleted before launching the program.
 
 The pictures below are self-explanatory. The calendar applet can read calendar ics files, and update its content. The menu applet shows all the applications installed or added by the user. Right click on the progran to add it as bookmark. Right click on the bookmark to remove it. Type in something in the bottom for searching an installed program. The bar has its menu for reloading (changements in the config are taken into accout) and exiting.
 
