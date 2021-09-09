@@ -22,6 +22,8 @@ theme_style=""
 icon_theme=""
 # in the form "#XXXXXX" or "rgb(X, X, X)" or "colour name"
 scroll_handle_col="#B5B5B5"
+# show the name of the day: 0 no - 1 yes
+day_name=1
 # the calendar to read
 calendar_file=""
 # in the form "#XXXXXX" or "colour name"

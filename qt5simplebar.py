@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.3a
+#### v 1.4
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -129,7 +129,7 @@ def on_pop_menu(app_dirs_user, app_dirs_system):
     for el in menu:
         cat = el[2]
         if cat == "AudioVideo" or cat in audiovideo_extended_categories:
-            # label - executable - icon
+            # label - executable - icon - comment
             Multimedia.append([el[0],el[4],el[5],el[6]])
         elif cat == "Development" or cat in development_extended_categories:
             Development.append([el[0],el[4],el[5],el[6]])
@@ -227,11 +227,16 @@ class MainWin(QtWidgets.QMainWindow):
         self.tlabel.setFont(tfont)
         if calendar_label_font_color:
             self.tlabel.setStyleSheet("color: {}".format(calendar_label_font_color))
+        self.tlabel.setStyleSheet("QLabel::hover { background-color: lightgrey; border: 2px lightgrey; border-radius: 15px;}")
         self.tlabel.setAlignment(QtCore.Qt.AlignCenter)
         self.cbox.addWidget(self.tlabel)
         #
-        cur_time = QtCore.QTime.currentTime().toString('hh:mm')
-        self.tlabel.setText(cur_time)
+        cur_time = QtCore.QTime.currentTime().toString("hh:mm")
+        if day_name:
+            curr_date = QtCore.QDate.currentDate().toString("ddd d")
+            self.tlabel.setText(" "+curr_date+"  "+cur_time+" ")
+        else:
+            self.tlabel.setText(" "+cur_time+" ")
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_label)
         timer.start(60 * 1000)
@@ -298,7 +303,11 @@ class MainWin(QtWidgets.QMainWindow):
     # label time    
     def update_label(self):
         cur_time = QtCore.QTime.currentTime().toString('hh:mm')
-        self.tlabel.setText(cur_time)
+        if day_name:
+            curr_date = QtCore.QDate.currentDate().toString("ddd d")
+            self.tlabel.setText(" "+curr_date+"  "+cur_time+" ")
+        else:
+            self.tlabel.setText(" "+cur_time+" ")
     
     # click on tlabel
     def on_tlabel(self, e):
@@ -320,11 +329,13 @@ class MainWin(QtWidgets.QMainWindow):
                                         }
                                         
                                         QPushButton:hover {
-                                            background-color: rgb(190,190,190);
+                                            background-color: lightgrey;
+                                            border-radius: 15px;
                                         }
                                         
                                         QPushButton:pressed {
-                                            background-color: rgb(190,190,190);     
+                                            background-color: lightgrey;
+                                            border-radius: 15px;
                                         }
                                     """)
     
@@ -477,12 +488,16 @@ class menuWin(QtWidgets.QWidget):
         hpalette = self.palette().mid().color().name()
         csaa = ("QPushButton::hover:!pressed { border: none;")
         csab = ("background-color: {};".format(hpalette))
-        csac = ("border-radius: 3px;}")
-        csa = csaa+csab+csac
+        csac = ("border-radius: 3px;")
+        csad = ("text-align: left; }")
+        csae = ("QPushButton { text-align: left;  padding: 5px;}")
+        csa = csaa+csab+csac+csad+csae
         self.pref.setStyleSheet(csa)
         ###########
+        self.pref.setCheckable(True)
+        self.pref.setAutoExclusive(True)
         self.pref.clicked.connect(self.on_pref_clicked)
-        self.rbox.addWidget(self.pref, alignment=QtCore.Qt.AlignLeft)
+        self.rbox.addWidget(self.pref)
         #
         sepLine = QtWidgets.QFrame()
         sepLine.setFrameShape(QtWidgets.QFrame.HLine)
@@ -507,6 +522,7 @@ class menuWin(QtWidgets.QWidget):
             self.window.cwin_is_shown = None
         #
         self.emulate_clicked(self.pref, 100)
+        self.pref.setChecked(True)
         #
         self.listWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.listWidget.customContextMenuRequested.connect(self.itemClicked)
@@ -581,11 +597,15 @@ class menuWin(QtWidgets.QWidget):
             hpalette = self.palette().mid().color().name()
             csaa = ("QPushButton::hover:!pressed { border: none;")
             csab = ("background-color: {};".format(hpalette))
-            csac = ("border-radius: 3px;}")
-            csa = csaa+csab+csac
+            csac = ("border-radius: 3px;")
+            csad = ("text-align: left; }")
+            csae = ("QPushButton { text-align: left;  padding: 5px;}")
+            csa = csaa+csab+csac+csad+csae
             btn.setStyleSheet(csa)
             ##########
-            self.rboxBtn.addWidget(btn, alignment=QtCore.Qt.AlignLeft)
+            btn.setCheckable(True)
+            btn.setAutoExclusive(True)
+            self.rboxBtn.addWidget(btn)
             btn.clicked.connect(self.on_btn_clicked)
             
     
@@ -615,6 +635,7 @@ class menuWin(QtWidgets.QWidget):
                 self.listWidget.itemClicked.connect(self.listwidgetclicked)
                 #
         self.listWidget.scrollToTop()
+        
     
     # add the bookmark
     def listItemRightClicked(self, QPos):
@@ -708,6 +729,9 @@ class menuWin(QtWidgets.QWidget):
                 self.listWidget.itemClicked.connect(self.listwidgetclicked)
                 #
         self.listWidget.sortItems(QtCore.Qt.AscendingOrder)
+        self.listWidget.scrollToTop()
+        self.listWidget.item(0).setSelected(False)
+        
     
     #
     def listItemRightClickedToRemove(self, QPos):
@@ -781,9 +805,11 @@ class calendarWin(QtWidgets.QWidget):
         #
         self.pmonth = QtWidgets.QPushButton()
         self.pmonth.setIcon(QtGui.QIcon("icons/go-prev.png"))
+        self.pmonth.setFlat(True)
         #
         self.nmonth = QtWidgets.QPushButton()
         self.nmonth.setIcon(QtGui.QIcon("icons/go-next.png"))
+        self.nmonth.setFlat(True)
         #
         self.pmonth.clicked.connect(self.on_prev_month)
         self.nmonth.clicked.connect(self.on_next_month)
