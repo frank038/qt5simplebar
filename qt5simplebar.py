@@ -596,7 +596,7 @@ class menuWin(QtWidgets.QWidget):
     # seeking in the program lists
     def search_program(self, text):
         if len(text) == 0:
-            self.on_pref_clicked()
+            pass
         elif len(text) > 2:
             self.listWidget.clear()
             app_list = ["Development", "Education","Game",
