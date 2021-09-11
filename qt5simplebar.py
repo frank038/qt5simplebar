@@ -563,6 +563,8 @@ class menuWin(QtWidgets.QWidget):
         self.itemBookmark = 1
         #
         self.installEventFilter(self)
+        #
+        self.setAttribute(QtCore.Qt.WA_X11NetWmWindowTypeDock)
     
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.WindowDeactivate:
@@ -596,7 +598,8 @@ class menuWin(QtWidgets.QWidget):
     # seeking in the program lists
     def search_program(self, text):
         if len(text) == 0:
-            pass
+            self.emulate_clicked(self.pref, 100)
+            self.pref.setChecked(True)
         elif len(text) > 2:
             self.listWidget.clear()
             app_list = ["Development", "Education","Game",
