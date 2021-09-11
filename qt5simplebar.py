@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.4
+#### v 1.5
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -14,6 +14,8 @@ from pop_menu import getMenu
 WINW = 0
 WINH = 0
 
+#
+menu_is_changed = 0
 ################
 # load the database
 fopen = calendar_file
@@ -122,8 +124,35 @@ education_extended_categories = ["Art","Construction","Music","Languages",
 system_extended_categories = ["FileManager","TerminalEmulator","FileSystem",
                              "Monitor","Core"]
 
+# the dirs of the application files
+app_dirs_user = [os.path.expanduser("~")+"/.local/share/applications"]
+app_dirs_system = ["/usr/share/applications", "/usr/local/share/applications"]
+
 # populate the menu
 def on_pop_menu(app_dirs_user, app_dirs_system):
+    #
+    global Development
+    Development = []
+    global Education
+    Education = []
+    global Game
+    Game = []
+    global Graphics
+    Graphics = []
+    global Multimedia
+    Multimedia = []
+    global Network
+    Network = []
+    global Office
+    Office = []
+    global Settings
+    Settings = []
+    global System
+    System = []
+    global Utility
+    Utility = []
+    global Missed
+    Missed = []
     #
     menu = getMenu(app_dirs_user, app_dirs_system).retList()[0]
     for el in menu:
@@ -151,10 +180,13 @@ def on_pop_menu(app_dirs_user, app_dirs_system):
             Utility.append([el[0],el[4],el[5],el[6]])
         else:
             Missed.append([el[0],el[4],el[5],el[6]])
-
-# the dirs of the application files
-app_dirs_user = [os.path.expanduser("~")+"/.local/share/applications"]
-app_dirs_system = ["/usr/share/applications", "/usr/local/share/applications"]
+    #
+    global menu_is_changed
+    if menu_is_changed == 1:
+        menu_is_changed = 0
+    elif menu_is_changed > 1:
+        menu_is_changed = 0
+        on_pop_menu(app_dirs_user, app_dirs_system)
 
 on_pop_menu(app_dirs_user, app_dirs_system)
 
@@ -475,16 +507,17 @@ class menuWin(QtWidgets.QWidget):
         self.line_edit.setStyleSheet("background: white")
         self.line_edit.textChanged.connect(self.on_line_edit)
         self.lbox.addWidget(self.line_edit)
+        self.line_edit.setFocus(True)
         
         ##### right box
         self.rbox = QtWidgets.QVBoxLayout()
         self.rbox.setContentsMargins(0,0,0,0)
         self.hbox.addLayout(self.rbox)
-        #
+        #############
         self.pref = QtWidgets.QPushButton("Bookmarks")
         self.pref.setIcon(QtGui.QIcon("icons/bookmark.svg"))
         self.pref.setFlat(True)
-        ##########
+        #
         hpalette = self.palette().mid().color().name()
         csaa = ("QPushButton::hover:!pressed { border: none;")
         csab = ("background-color: {};".format(hpalette))
@@ -493,12 +526,12 @@ class menuWin(QtWidgets.QWidget):
         csae = ("QPushButton { text-align: left;  padding: 5px;}")
         csa = csaa+csab+csac+csad+csae
         self.pref.setStyleSheet(csa)
-        ###########
+        #
         self.pref.setCheckable(True)
         self.pref.setAutoExclusive(True)
         self.pref.clicked.connect(self.on_pref_clicked)
         self.rbox.addWidget(self.pref)
-        #
+        #############
         sepLine = QtWidgets.QFrame()
         sepLine.setFrameShape(QtWidgets.QFrame.HLine)
         sepLine.setFrameShadow(QtWidgets.QFrame.Plain)
@@ -528,7 +561,16 @@ class menuWin(QtWidgets.QWidget):
         self.listWidget.customContextMenuRequested.connect(self.itemClicked)
         # which button has been pressed
         self.itemBookmark = 1
-
+        #
+        self.installEventFilter(self)
+    
+    def eventFilter(self, object, event):
+        if event.type() == QtCore.QEvent.WindowDeactivate:
+            self.window.mw_is_shown.close()
+            self.window.mw_is_shown = None
+            return True
+        return False
+    
     #
     def itemClicked(self, QPos):
         item_idx = self.listWidget.indexAt(QPos)
@@ -553,7 +595,9 @@ class menuWin(QtWidgets.QWidget):
     
     # seeking in the program lists
     def search_program(self, text):
-        if len(text) > 2:
+        if len(text) == 0:
+            self.on_pref_clicked()
+        elif len(text) > 2:
             self.listWidget.clear()
             app_list = ["Development", "Education","Game",
                         "Graphics", "Multimedia", "Network",
@@ -1045,12 +1089,17 @@ class closeWin(QtWidgets.QWidget):
         #
         shut_icon = QtGui.QIcon("icons/system-shutdown.svg")
         self.shut = QtWidgets.QPushButton(shut_icon, "Shutdown")
+        self.shut.setFlat(True)
+        csa = ("QPushButton { text-align: left;  padding: 5px;}")
+        self.shut.setStyleSheet(csa)
         self.shut.clicked.connect(self.on_shut)
         self.mbox.addWidget(self.shut)
         self.shut.setDefault(True)
         #
         rest_icon = QtGui.QIcon("icons/system-restart.svg")
         self.rest = QtWidgets.QPushButton(rest_icon, "Restart")
+        self.rest.setFlat(True)
+        self.rest.setStyleSheet(csa)
         self.rest.clicked.connect(self.on_rest)
         self.mbox.addWidget(self.rest)
         #
@@ -1178,32 +1227,15 @@ if __name__ == '__main__':
     # set the icon style globally
     if icon_theme:
         QtGui.QIcon.setThemeName(icon_theme)
-    #
+    
+    # some applications has been added or removed
     def directory_changed(edir):
-        #
-        global Development
-        Development = []
-        global Education
-        Education = []
-        global Game
-        Game = []
-        global Graphics
-        Graphics = []
-        global Multimedia
-        Multimedia = []
-        global Network
-        Network = []
-        global Office
-        Office = []
-        global Settings
-        Settings = []
-        global System
-        System = []
-        global Utility
-        Utility = []
-        global Missed
-        Missed = []
-        #
+        global menu_is_changed
+        menu_is_changed += 1
+        if menu_is_changed == 1:
+            on_directory_changed()
+    
+    def on_directory_changed():
         on_pop_menu(app_dirs_system, app_dirs_user)
     
     # check for changes in the application directories

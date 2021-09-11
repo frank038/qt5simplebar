@@ -1,7 +1,7 @@
 # the height of the bar (it depends also on the font size)
 bar_size=32
 # use stalonetray as system tray: 0 no - 1 yes
-use_stalonetray = 0
+use_stalonetray = 1
 # the icon size in the tray
 tray_icon_size = bar_size
 # from right to left
@@ -17,7 +17,7 @@ border_radius=15
 # blur radius
 blur_radius=15
 # theme style: "" to use the default theme
-theme_style=""
+theme_style="Fusion"
 # icon theme: "" to use the default theme
 icon_theme=""
 # in the form "#XXXXXX" or "rgb(X, X, X)" or "colour name"
