@@ -1106,11 +1106,22 @@ class closeWin(QtWidgets.QWidget):
         self.rest.clicked.connect(self.on_rest)
         self.mbox.addWidget(self.rest)
         #
+        hpalette = self.palette().mid().color().name()
+        csaa = ("QPushButton::hover:!pressed { border: none;")
+        csab = ("background-color: {};".format(hpalette))
+        csac = ("border-radius: 3px;")
+        csad = ("text-align: left; }")
+        csae = ("QPushButton { text-align: left;  padding: 5px;}")
+        csa = csaa+csab+csac+csad+csae
+        self.shut.setStyleSheet(csa)
+        self.rest.setStyleSheet(csa)
+        #
         if logout_command:
             rest_logo = QtGui.QIcon("icons/system-logout.svg")
             self.logo = QtWidgets.QPushButton(rest_logo, "Logout")
             self.logo.clicked.connect(self.on_logo)
             self.mbox.addWidget(self.logo)
+            self.logo.setStyleSheet(csa)
         #
         if self.window.cw_is_shown:
             self.window.cw_is_shown.close()
@@ -1118,7 +1129,7 @@ class closeWin(QtWidgets.QWidget):
         if self.window.mw_is_shown:
             self.window.mw_is_shown.close()
             self.window.mw_is_shown = None
-        
+        #
         self.show()
         #
         sw = self.size().width()
