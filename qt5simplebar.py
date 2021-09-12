@@ -411,8 +411,8 @@ class menuWin(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(menuWin, self).__init__(parent)
         self.window = window
-        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowDoesNotAcceptFocus)
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool)
+        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
         ####### 
         self.mainBox = QtWidgets.QHBoxLayout()
         self.setLayout(self.mainBox)
@@ -564,7 +564,7 @@ class menuWin(QtWidgets.QWidget):
         #
         self.installEventFilter(self)
         #
-        self.setAttribute(QtCore.Qt.WA_X11NetWmWindowTypeDock)
+        # self.setAttribute(QtCore.Qt.WA_X11NetWmWindowTypeDock)
     
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.WindowDeactivate:
@@ -803,7 +803,8 @@ class calendarWin(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(calendarWin, self).__init__(parent)
         self.window = window
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowDoesNotAcceptFocus)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool)
+        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
         ####### box 
         mainBox = QtWidgets.QHBoxLayout()
         self.setLayout(mainBox)
@@ -932,6 +933,15 @@ class calendarWin(QtWidgets.QWidget):
         if not with_compositor:
             cwY += 2
         self.setGeometry(cwX, cwY, -1,-1)
+        #
+        self.installEventFilter(self)
+    
+    def eventFilter(self, object, event):
+        if event.type() == QtCore.QEvent.WindowDeactivate:
+            self.window.cw_is_shown.close()
+            self.window.cw_is_shown = None
+            return True
+        return False
         
     #
     def go_today(self, e):
@@ -1057,8 +1067,8 @@ class closeWin(QtWidgets.QWidget):
         super(closeWin, self).__init__(parent)
         self.window = window
         #
-        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool)
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowDoesNotAcceptFocus)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool)
+        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
         #
         self.hbox = QtWidgets.QVBoxLayout()
         self.setLayout(self.hbox)
@@ -1148,6 +1158,15 @@ class closeWin(QtWidgets.QWidget):
             else:
                 sx += 2
         self.setGeometry(sx, sy, sw, sh)
+        #
+        self.installEventFilter(self)
+    
+    def eventFilter(self, object, event):
+        if event.type() == QtCore.QEvent.WindowDeactivate:
+            self.window.cwin_is_shown.close()
+            self.window.cwin_is_shown = None
+            return True
+        return False
     
     def process_finished(self):
         self.process = None
