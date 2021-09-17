@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.5
+#### v 1.6
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -209,6 +209,7 @@ class showDialog(QtWidgets.QDialog):
 
         self.layout = QtWidgets.QVBoxLayout()
         message = QtWidgets.QLabel(lcontent)
+        message.setAlignment(QtCore.Qt.AlignCenter)
         self.layout.addWidget(message)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
@@ -242,7 +243,9 @@ class MainWin(QtWidgets.QMainWindow):
         self.gbox.addLayout(self.abox, 0,0)
         
         self.mbutton = QtWidgets.QPushButton(self, flat=True)
+        self.mbutton.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.mbutton.setIcon(QtGui.QIcon("icons/menu.png"))
+        self.mbutton.setIconSize(QtCore.QSize(icon_size, icon_size))
         self.btn_style_sheet(self.mbutton)
         self.mbutton.clicked.connect(self.on_click)
         ###### 
@@ -282,7 +285,9 @@ class MainWin(QtWidgets.QMainWindow):
         self.zbox.addItem(orSpacer2)
         self.gbox.addLayout(self.zbox, 0,10)
         self.ebutton = QtWidgets.QPushButton(self, flat=True)
+        self.ebutton.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.ebutton.setIcon(QtGui.QIcon("icons/user.png"))
+        self.ebutton.setIconSize(QtCore.QSize(icon_size, icon_size))
         self.ebutton.clicked.connect(self.on_close)
         # set the style
         self.btn_style_sheet(self.ebutton)
@@ -733,6 +738,7 @@ class menuWin(QtWidgets.QWidget):
     # execute the program from the menu
     def listwidgetclicked(self, item):
         self.p = QtCore.QProcess()
+        self.p.setWorkingDirectory(os.getenv("HOME"))
         self.p.start(str(item.exec_n))
         # close the menu window
         if self.window.mw_is_shown is not None:

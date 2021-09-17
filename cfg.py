@@ -1,5 +1,7 @@
 # the height of the bar (it depends also on the font size)
 bar_size=32
+# icon size
+icon_size=bar_size
 # use stalonetray as system tray: 0 no - 1 yes
 use_stalonetray = 0
 # the icon size in the tray
