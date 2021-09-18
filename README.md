@@ -4,7 +4,7 @@ A simple dock with menu and calendar.
 
 Free to use and modify.
 
-Require:
+This program needs:
 - python3
 - pyqt5
 - python3-xdg
