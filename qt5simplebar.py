@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.6
+#### v 1.7
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -77,53 +77,6 @@ System = []
 Utility = []
 Missed = []
 
-# extended categories
-development_extended_categories = ["Building","Debugger","IDE","GUIDesigner",
-                                  "Profiling","RevisionControl","Translation",
-                                  "Database","WebDevelopment"]
-
-office_extended_categories = ["Calendar","ContanctManagement","Office",
-                             "Dictionary","Chart","Email","Finance","FlowChart",
-                             "PDA","ProjectManagement","Presentation","Spreadsheet",
-                             "WordProcessor","Engineering"]
-
-graphics_extended_categories = ["2DGraphics","VectorGraphics","RasterGraphics",
-                               "3DGraphics","Scanning","OCR","Photography",
-                               "Publishing","Viewer"]
-
-utility_extended_categories = ["TextTools","TelephonyTools","Compression",
-                              "FileTools","Calculator","Clock","TextEditor",
-                              "Documentation"]
-
-settings_extended_categories = ["DesktopSettings","HardwareSettings",
-                               "Printing","PackageManager","Security",
-                               "Accessibility"]
-
-network_extended_categories = ["Dialup","InstantMessaging","Chat","IIRCClient",
-                              "FileTransfer","HamRadio","News","P2P","RemoteAccess",
-                              "Telephony","VideoConference","WebBrowser"]
-
-# added "Audio" and "Video" main categories
-audiovideo_extended_categories = ["Audio","Video","Midi","Mixer","Sequencer","Tuner","TV",
-                                 "AudioVideoEditing","Player","Recorder",
-                                 "DiscBurning"]
-
-game_extended_categories = ["ActionGame","AdventureGame","ArcadeGame",
-                           "BoardGame","BlockGame","CardGame","KidsGame",
-                           "LogicGame","RolePlaying","Simulation","SportGame",
-                           "StrategyGame","Amusement","Emulator"]
-
-education_extended_categories = ["Art","Construction","Music","Languages",
-                                "Science","ArtificialIntelligence","Astronomy",
-                                "Biology","Chemistry","ComputerScience","DataVisualization",
-                                "Economy","Electricity","Geography","Geology","Geoscience",
-                                "History","ImageProcessing","Literature","Math","NumericAnalysis",
-                                "MedicalSoftware","Physics","Robots","Sports","ParallelComputing",
-                                "Electronics"]
-
-system_extended_categories = ["FileManager","TerminalEmulator","FileSystem",
-                             "Monitor","Core"]
-
 # the dirs of the application files
 app_dirs_user = [os.path.expanduser("~")+"/.local/share/applications"]
 app_dirs_system = ["/usr/share/applications", "/usr/local/share/applications"]
@@ -154,32 +107,32 @@ def on_pop_menu(app_dirs_user, app_dirs_system):
     global Missed
     Missed = []
     #
-    menu = getMenu(app_dirs_user, app_dirs_system).retList()[0]
+    menu = getMenu(app_dirs_user, app_dirs_system).retList()
     for el in menu:
-        cat = el[2]
-        if cat == "AudioVideo" or cat in audiovideo_extended_categories:
+        cat = el[1]
+        if cat == "Multimedia":
             # label - executable - icon - comment
-            Multimedia.append([el[0],el[4],el[5],el[6]])
-        elif cat == "Development" or cat in development_extended_categories:
-            Development.append([el[0],el[4],el[5],el[6]])
-        elif cat == "Education" or cat in education_extended_categories:
-            Education.append([el[0],el[4],el[5],el[6]])
-        elif cat == "Game" or cat in game_extended_categories:
-            Game.append([el[0],el[4],el[5],el[6]])
-        elif cat == "Graphics" or cat in graphics_extended_categories:
-            Graphics.append([el[0],el[4],el[5],el[6]])
-        elif cat == "Network" or cat in network_extended_categories:
-            Network.append([el[0],el[4],el[5],el[6]])
-        elif cat == "Office" or cat in office_extended_categories:
-            Office.append([el[0],el[4],el[5],el[6]])
-        elif cat == "Settings" or cat in settings_extended_categories:
-            Settings.append([el[0],el[4],el[5],el[6]])
-        elif cat == "System" or cat in system_extended_categories:
-            System.append([el[0],el[4],el[5],el[6]])
-        elif cat == "Utility" or cat in utility_extended_categories:
-            Utility.append([el[0],el[4],el[5],el[6]])
+            Multimedia.append([el[0],el[2],el[3],el[4]])
+        elif cat == "Development":
+            Development.append([el[0],el[2],el[3],el[4]])
+        elif cat == "Education":
+            Education.append([el[0],el[2],el[3],el[4]])
+        elif cat == "Game":
+            Game.append([el[0],el[2],el[3],el[4]])
+        elif cat == "Graphics":
+            Graphics.append([el[0],el[2],el[3],el[4]])
+        elif cat == "Network":
+            Network.append([el[0],el[2],el[3],el[4]])
+        elif cat == "Office":
+            Office.append([el[0],el[2],el[3],el[4]])
+        elif cat == "Settings":
+            Settings.append([el[0],el[2],el[3],el[4]])
+        elif cat == "System":
+            System.append([el[0],el[2],el[3],el[4]])
+        elif cat == "Utility":
+            Utility.append([el[0],el[2],el[3],el[4]])
         else:
-            Missed.append([el[0],el[4],el[5],el[6]])
+            Missed.append([el[0],el[2],el[3],el[4]])
     #
     global menu_is_changed
     if menu_is_changed == 1:
@@ -1257,8 +1210,16 @@ if __name__ == '__main__':
                            _display.intern_atom('CARDINAL'), 32,
                            [0, 0, WINH, 0, 0, 0, 0, 0, x, x+WINW-1, 0, 0],
                            X.PropModeReplace)
+    #_window.set_wm_state(_display.intern_atom('_NET_WM_STATE_SKIP_TASKBAR'))
     #
     _display.sync()
+    # from ewmh import EWMH
+    # ewmh = EWMH()
+    # #ewmh.setWmState(_window, 1, '_NET_WM_STATE_SKIP_TASKBAR')
+    # atom = lambda s: _display.intern_atom(s)
+    # ewmh.setProperty(atom("_NET_WM_STATE_SKIP_TASKBAR"), _window)
+    # ewmh.display.flush()
+    # ewmh.display.sync()
     # set new style globally
     if theme_style:
         s = QtWidgets.QStyleFactory.create(theme_style)
