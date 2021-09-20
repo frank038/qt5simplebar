@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-#### v 1.7
+#### v 1.8
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
 from Xlib.display import Display
 from Xlib import X
 import datetime
+import subprocess, signal
 from cfg import *
 sys.path.append("modules")
 from pop_menu import getMenu
@@ -426,6 +427,7 @@ class menuWin(QtWidgets.QWidget):
         self.hbox.addLayout(self.lbox)
         #
         self.listWidget = QtWidgets.QListWidget(self)
+        self.listWidget.itemClicked.connect(self.listwidgetclicked)
         self.lbox.addWidget(self.listWidget)
         hpalette = self.palette().highlight().color().name()
         csaa = ("QListWidget::item:hover {")
@@ -580,7 +582,6 @@ class menuWin(QtWidgets.QWidget):
                             litem.exec_n = el[1]
                             litem.setToolTip(el[3])
                             self.listWidget.addItem(litem)
-                            self.listWidget.itemClicked.connect(self.listwidgetclicked)
         else:
             self.listWidget.clear()
     
@@ -637,7 +638,6 @@ class menuWin(QtWidgets.QWidget):
                 litem.exec_n = el[1]
                 litem.setToolTip(el[3])
                 self.listWidget.addItem(litem)
-                self.listWidget.itemClicked.connect(self.listwidgetclicked)
                 #
         self.listWidget.scrollToTop()
         
@@ -692,7 +692,9 @@ class menuWin(QtWidgets.QWidget):
     def listwidgetclicked(self, item):
         self.p = QtCore.QProcess()
         self.p.setWorkingDirectory(os.getenv("HOME"))
-        self.p.start(str(item.exec_n))
+        # self.p.start(str(item.exec_n))
+        self.p.setProgram(str(item.exec_n))
+        self.p.startDetached()
         # close the menu window
         if self.window.mw_is_shown is not None:
             self.window.mw_is_shown.close()
@@ -732,7 +734,6 @@ class menuWin(QtWidgets.QWidget):
                 litem.setToolTip(TOOLTIP)
                 litem.file_name = FILENAME
                 self.listWidget.addItem(litem)
-                self.listWidget.itemClicked.connect(self.listwidgetclicked)
                 #
         self.listWidget.sortItems(QtCore.Qt.AscendingOrder)
         self.listWidget.scrollToTop()
@@ -1210,16 +1211,8 @@ if __name__ == '__main__':
                            _display.intern_atom('CARDINAL'), 32,
                            [0, 0, WINH, 0, 0, 0, 0, 0, x, x+WINW-1, 0, 0],
                            X.PropModeReplace)
-    #_window.set_wm_state(_display.intern_atom('_NET_WM_STATE_SKIP_TASKBAR'))
-    #
     _display.sync()
-    # from ewmh import EWMH
-    # ewmh = EWMH()
-    # #ewmh.setWmState(_window, 1, '_NET_WM_STATE_SKIP_TASKBAR')
-    # atom = lambda s: _display.intern_atom(s)
-    # ewmh.setProperty(atom("_NET_WM_STATE_SKIP_TASKBAR"), _window)
-    # ewmh.display.flush()
-    # ewmh.display.sync()
+    #
     # set new style globally
     if theme_style:
         s = QtWidgets.QStyleFactory.create(theme_style)
@@ -1265,18 +1258,26 @@ if __name__ == '__main__':
         else:
             tray_y_offset = 0
             tray_icon_size = str(tray_icon_size)
-        p = QtCore.QProcess()
+        # p = QtCore.QProcess()
         #
+        # spid = 0
         def start_tray():
             try:
-                p.start(tray, ["--skip-taskbar", "-geometry", "+{}+{}".format(WINW-tray_offset, tray_y_offset), "--icon-size", tray_icon_size, "--sticky", "--grow-gravity", "E", "--icon-gravity", "W", "--window-layer", "top", "--background", hpalette])
+                # stalone_args = ["--skip-taskbar", "-geometry", "+{}+{}".format(WINW-tray_offset, tray_y_offset), "--icon-size", tray_icon_size, "--sticky", "--grow-gravity", "E", "--icon-gravity", "W", "--window-layer", "top", "--background", hpalette]
+                # p.start(tray, stalone_args)
+                stalone_prog = ["stalonetray", "--skip-taskbar", "-geometry", "+{}+{}".format(WINW-tray_offset, tray_y_offset), "--icon-size", tray_icon_size, "--sticky", "--grow-gravity", "E", "--icon-gravity", "W", "--window-layer", "top", "--background", hpalette]
+                sret = subprocess.Popen(stalone_prog)
+                global spid
+                spid = sret.pid
             except Exception as E:
                 dlg = showDialog(1, "Something happend with the tray.\n{}".format(str(E)), window)
                 result = dlg.exec_()
                 dlg.close()
         start_tray()
         ret = app.exec_()
-        p.terminate()
+        #p.terminate()
+        if spid:
+            os.kill(spid, signal.SIGTERM)
         time.sleep(0.5)
         sys.exit(ret)
     else:
