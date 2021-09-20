@@ -151,7 +151,7 @@ class getMenu():
             elif cccat in self.office_extended_categories:
                 return "Office"
             elif cccat in self.graphics_extended_categories:
-                return "Game"
+                return "Graphics"
             elif cccat in self.utility_extended_categories:
                 return "Utility"
             elif cccat in self.settings_extended_categories:
