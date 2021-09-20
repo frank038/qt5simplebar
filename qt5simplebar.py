@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.8.1
+#### v 1.8.2
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -690,10 +690,11 @@ class menuWin(QtWidgets.QWidget):
     
     # execute the program from the menu
     def listwidgetclicked(self, item):
-        self.p = QtCore.QProcess()
-        self.p.setWorkingDirectory(os.getenv("HOME"))
-        # self.p.start(str(item.exec_n))
-        self.p.startDetached(str(item.exec_n))
+        # self.p = QtCore.QProcess()
+        # self.p.setWorkingDirectory(os.getenv("HOME"))
+        # # self.p.start(str(item.exec_n))
+        # self.p.startDetached(str(item.exec_n))
+        os.system("cd {} && {} &".format(os.getenv("HOME"), str(item.exec_n)))
         # close the menu window
         if self.window.mw_is_shown is not None:
             self.window.mw_is_shown.close()
