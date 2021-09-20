@@ -49,6 +49,6 @@ appointment_char="✔"
 #
 shutdown_command="shutdown -P now"
 #
-restart_command="shutdown -r"
+restart_command="reboot"
 #
 logout_command=""
