@@ -131,7 +131,7 @@ class getMenu():
                         # comment
                         fcomment = entry.getComment()
                         ###
-                        self.lists.append([fname, fcategory, fexec, ficon, fcomment])
+                        self.lists.append([fname, fcategory or "Missed", fexec, ficon, fcomment])
                     except:
                         pass
 
