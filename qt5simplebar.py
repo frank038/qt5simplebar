@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.8.2
+#### v 1.9.0
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -76,7 +76,7 @@ Office = []
 Settings = []
 System = []
 Utility = []
-Missed = []
+Other = []
 
 # the dirs of the application files
 app_dirs_user = [os.path.expanduser("~")+"/.local/share/applications"]
@@ -105,8 +105,8 @@ def on_pop_menu(app_dirs_user, app_dirs_system):
     System = []
     global Utility
     Utility = []
-    global Missed
-    Missed = []
+    global Other
+    Other = []
     #
     menu = getMenu(app_dirs_user, app_dirs_system).retList()
     for el in menu:
@@ -133,7 +133,7 @@ def on_pop_menu(app_dirs_user, app_dirs_system):
         elif cat == "Utility":
             Utility.append([el[0],el[2],el[3],el[4]])
         else:
-            Missed.append([el[0],el[2],el[3],el[4]])
+            Other.append([el[0],el[2],el[3],el[4]])
     #
     global menu_is_changed
     if menu_is_changed == 1:
@@ -474,17 +474,37 @@ class menuWin(QtWidgets.QWidget):
         self.rbox.setContentsMargins(0,0,0,0)
         self.hbox.addLayout(self.rbox)
         #############
+        self.fake_btn = QtWidgets.QPushButton()
+        self.fake_btn.setCheckable(True)
+        self.fake_btn.setAutoExclusive(True)
+        self.rbox.addWidget(self.fake_btn)
+        self.fake_btn.hide()
+        #
         self.pref = QtWidgets.QPushButton("Bookmarks")
         self.pref.setIcon(QtGui.QIcon("icons/bookmark.svg"))
         self.pref.setFlat(True)
         #
         hpalette = self.palette().mid().color().name()
-        csaa = ("QPushButton::hover:!pressed { border: none;")
-        csab = ("background-color: {};".format(hpalette))
-        csac = ("border-radius: 3px;")
-        csad = ("text-align: left; }")
-        csae = ("QPushButton { text-align: left;  padding: 5px;}")
-        csa = csaa+csab+csac+csad+csae
+        if with_compositor:
+            csaa = ("QPushButton::hover:!pressed { border: none;")
+            csab = ("background-color: {};".format(hpalette))
+            csac = ("border-radius: 10px;")
+            csad = ("text-align: left; }")
+            csae = ("QPushButton { text-align: left;  padding: 5px;}")
+            csaf = ("QPushButton::checked { text-align: left; ")
+            csag = ("background-color: {};".format(self.palette().midlight().color().name()))
+            csah = ("padding: 5px; border-radius: 10px;}")
+            csa = csaa+csab+csac+csad+csae+csaf+csag+csah
+        else:
+            csaa = ("QPushButton::hover:!pressed { border: none;")
+            csab = ("background-color: {};".format(hpalette))
+            csac = ("border-radius: 3px;")
+            csad = ("text-align: left; }")
+            csae = ("QPushButton { text-align: left;  padding: 5px;}")
+            csaf = ("QPushButton::checked { text-align: left; ")
+            csag = ("background-color: {};".format(self.palette().midlight().color().name()))
+            csah = ("padding: 5px; border-radius: 3px;}")
+            csa = csaa+csab+csac+csad+csae+csaf+csag+csah
         self.pref.setStyleSheet(csa)
         #
         self.pref.setCheckable(True)
@@ -528,9 +548,10 @@ class menuWin(QtWidgets.QWidget):
     
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.WindowDeactivate:
-            self.window.mw_is_shown.close()
-            self.window.mw_is_shown = None
-            return True
+            if self.window.mw_is_shown:
+                self.window.mw_is_shown.close()
+                self.window.mw_is_shown = None
+                return True
         return False
     
     #
@@ -552,6 +573,7 @@ class menuWin(QtWidgets.QWidget):
     #
     def on_line_edit(self, text):
         self.listWidget.clear()
+        self.fake_btn.setChecked(True)
         self.search_program(text)
         
     
@@ -564,7 +586,7 @@ class menuWin(QtWidgets.QWidget):
             self.listWidget.clear()
             app_list = ["Development", "Education","Game",
                         "Graphics", "Multimedia", "Network",
-                        "Office","Settings","System","Utility", "Missed"]
+                        "Office","Settings","System","Utility", "Other"]
             #
             for ell in app_list:
                 if globals()[ell] == []:
@@ -592,7 +614,7 @@ class menuWin(QtWidgets.QWidget):
         #
         app_list = ["Development", "Education","Game",
                     "Graphics", "Multimedia", "Network",
-                    "Office","Settings","System","Utility", "Missed"]
+                    "Office","Settings","System","Utility","Other"]
         for el in app_list:
             if globals()[el] == []:
                 continue
@@ -601,12 +623,26 @@ class menuWin(QtWidgets.QWidget):
             btn.setFlat(True)
             ##########
             hpalette = self.palette().mid().color().name()
-            csaa = ("QPushButton::hover:!pressed { border: none;")
-            csab = ("background-color: {};".format(hpalette))
-            csac = ("border-radius: 3px;")
-            csad = ("text-align: left; }")
-            csae = ("QPushButton { text-align: left;  padding: 5px;}")
-            csa = csaa+csab+csac+csad+csae
+            if with_compositor:
+                csaa = ("QPushButton::hover:!pressed { border: none;")
+                csab = ("background-color: {};".format(hpalette))
+                csac = ("border-radius: 10px;")
+                csad = ("text-align: left; }")
+                csae = ("QPushButton { text-align: left;  padding: 5px;}")
+                csaf = ("QPushButton::checked { text-align: left; ")
+                csag = ("background-color: {};".format(self.palette().midlight().color().name()))
+                csah = ("padding: 5px; border-radius: 10px;}")
+                csa = csaa+csab+csac+csad+csae+csaf+csag+csah
+            else:
+                csaa = ("QPushButton::hover:!pressed { border: none;")
+                csab = ("background-color: {};".format(hpalette))
+                csac = ("border-radius: 3px;")
+                csad = ("text-align: left; }")
+                csae = ("QPushButton { text-align: left;  padding: 5px;}")
+                csaf = ("QPushButton::checked { text-align: left; ")
+                csag = ("background-color: {};".format(self.palette().midlight().color().name()))
+                csah = ("padding: 5px; border-radius: 3px;}")
+                csa = csaa+csab+csac+csad+csae+csaf+csag+csah
             btn.setStyleSheet(csa)
             ##########
             btn.setCheckable(True)
@@ -621,6 +657,7 @@ class menuWin(QtWidgets.QWidget):
         cat_name = self.sender().text()
         cat_list = globals()[cat_name]
         self.listWidget.clear()
+        # self.line_edit.clear()
         for el in cat_list:
             # 0 name - 1 executable - 2 icon - 3 comment
             exe_path = sh_which(el[1].split(" ")[0])
@@ -704,6 +741,7 @@ class menuWin(QtWidgets.QWidget):
     def on_pref_clicked(self):
         self.itemBookmark = 1
         self.listWidget.clear()
+        # self.line_edit.clear()
         bookmark_files = os.listdir("bookmarks")
         prog_list = []
         for bb in bookmark_files:
@@ -898,9 +936,10 @@ class calendarWin(QtWidgets.QWidget):
     
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.WindowDeactivate:
-            self.window.cw_is_shown.close()
-            self.window.cw_is_shown = None
-            return True
+            if self.window.cw_is_shown:
+                self.window.cw_is_shown.close()
+                self.window.cw_is_shown = None
+                return True
         return False
         
     #
@@ -1059,12 +1098,32 @@ class closeWin(QtWidgets.QWidget):
             self.hbox.addLayout(self.mbox)
             self.hbox.setContentsMargins(2, 2, 2, 2)
             self.mbox.setContentsMargins(0, 0, 0, 0)
+        ### custom commands
+        if custom_command1:
+            def on_comm1():
+                os.system("cd {} && {} &".format(os.getenv("HOME"), custom_command1))
+            self.comm1 = QtWidgets.QPushButton(QtGui.QIcon(custom_command1_icon), custom_command1_name)
+            self.comm1.setFlat(True)
+            self.comm1.clicked.connect(on_comm1)
+            self.mbox.addWidget(self.comm1)
+        if custom_command2:
+            def on_comm2():
+                os.system("cd {} && {} &".format(os.getenv("HOME"), custom_command2))
+            self.comm2 = QtWidgets.QPushButton(QtGui.QIcon(custom_command2_icon), custom_command2_name)
+            self.comm2.setFlat(True)
+            self.comm2.clicked.connect(on_comm2)
+            self.mbox.addWidget(self.comm2)
+        if custom_command3:
+            def on_comm3():
+                os.system("cd {} && {} &".format(os.getenv("HOME"), custom_command3))
+            self.comm3 = QtWidgets.QPushButton(QtGui.QIcon(custom_command2_icon), custom_command3_name)
+            self.comm3.setFlat(True)
+            self.comm3.clicked.connect(on_comm3)
+            self.mbox.addWidget(self.comm3)
         #
         shut_icon = QtGui.QIcon("icons/system-shutdown.svg")
         self.shut = QtWidgets.QPushButton(shut_icon, "Shutdown")
         self.shut.setFlat(True)
-        csa = ("QPushButton { text-align: left;  padding: 5px;}")
-        self.shut.setStyleSheet(csa)
         self.shut.clicked.connect(self.on_shut)
         self.mbox.addWidget(self.shut)
         self.shut.setDefault(True)
@@ -1072,19 +1131,38 @@ class closeWin(QtWidgets.QWidget):
         rest_icon = QtGui.QIcon("icons/system-restart.svg")
         self.rest = QtWidgets.QPushButton(rest_icon, "Restart")
         self.rest.setFlat(True)
-        self.rest.setStyleSheet(csa)
         self.rest.clicked.connect(self.on_rest)
         self.mbox.addWidget(self.rest)
         #
         hpalette = self.palette().mid().color().name()
-        csaa = ("QPushButton::hover:!pressed { border: none;")
-        csab = ("background-color: {};".format(hpalette))
-        csac = ("border-radius: 3px;")
-        csad = ("text-align: left; }")
-        csae = ("QPushButton { text-align: left;  padding: 5px;}")
-        csa = csaa+csab+csac+csad+csae
+        if with_compositor:
+            csaa = ("QPushButton::hover:!pressed { border: none;")
+            csab = ("background-color: {};".format(hpalette))
+            csac = ("border-radius: 10px;")
+            csad = ("text-align: left; }")
+            csae = ("QPushButton { text-align: left;  padding: 5px;}")
+            csaf = ("QPushButton::checked { text-align: left; ")
+            csag = ("background-color: {};".format(self.palette().midlight().color().name()))
+            csah = ("padding: 5px; border-radius: 10px;}")
+            csa = csaa+csab+csac+csad+csae+csaf+csag+csah
+        else:
+            csaa = ("QPushButton::hover:!pressed { border: none;")
+            csab = ("background-color: {};".format(hpalette))
+            csac = ("border-radius: 3px;")
+            csad = ("text-align: left; }")
+            csae = ("QPushButton { text-align: left;  padding: 5px;}")
+            csaf = ("QPushButton::checked { text-align: left; ")
+            csag = ("background-color: {};".format(self.palette().midlight().color().name()))
+            csah = ("padding: 5px; border-radius: 3px;}")
+            csa = csaa+csab+csac+csad+csae+csaf+csag+csah
         self.shut.setStyleSheet(csa)
         self.rest.setStyleSheet(csa)
+        if custom_command1:
+            self.comm1.setStyleSheet(csa)
+        if custom_command2:
+            self.comm2.setStyleSheet(csa)
+        if custom_command3:
+            self.comm3.setStyleSheet(csa)
         #
         if logout_command:
             rest_logo = QtGui.QIcon("icons/system-logout.svg")
@@ -1123,9 +1201,10 @@ class closeWin(QtWidgets.QWidget):
     
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.WindowDeactivate:
-            self.window.cwin_is_shown.close()
-            self.window.cwin_is_shown = None
-            return True
+            if self.window.cwin_is_shown:
+                self.window.cwin_is_shown.close()
+                self.window.cwin_is_shown = None
+                return True
         return False
     
     def process_finished(self):
@@ -1211,8 +1290,8 @@ if __name__ == '__main__':
                            _display.intern_atom('CARDINAL'), 32,
                            [0, 0, WINH, 0, 0, 0, 0, 0, x, x+WINW-1, 0, 0],
                            X.PropModeReplace)
+    #_window.set_wm_state(_display.intern_atom('_NET_WM_STATE_SKIP_TASKBAR'))
     _display.sync()
-    #
     # set new style globally
     if theme_style:
         s = QtWidgets.QStyleFactory.create(theme_style)

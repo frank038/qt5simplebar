@@ -14,9 +14,9 @@ menu_left=1
 menu_width=800
 # to use with a compositor enabled: 0 no - 1 yes
 with_compositor=0
-# 
+# windows border radius
 border_radius=15
-# blur radius
+# shadow blur radius
 blur_radius=15
 # theme style: "" to use the default theme
 theme_style="Fusion"
@@ -52,3 +52,16 @@ shutdown_command="shutdown -P now"
 restart_command="reboot"
 #
 logout_command=""
+### custom commands
+# write a command or leave "" - label - icon or leave ""
+custom_command1=""
+custom_command1_name=""
+custom_command1_icon="icons/Missed.svg"
+#
+custom_command2=""
+custom_command2_name=""
+custom_command2_icon="icons/Missed.svg"
+#
+custom_command3=""
+custom_command3_name=""
+custom_command3_icon="icons/Missed.svg"
