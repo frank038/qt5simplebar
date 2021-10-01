@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.2
+#### v 1.9.3
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -661,32 +661,48 @@ class menuWin(QtWidgets.QWidget):
         self.listWidget.clear()
         # self.line_edit.clear()
         for el in cat_list:
+            #if el[1] == "searchmonkey":
             # 0 name - 1 executable - 2 icon - 3 comment - 4 path
             exe_path = sh_which(el[1].split(" ")[0])
-            file_info = QtCore.QFileInfo(exe_path)
-            if file_info.exists():
-                # set the full path first
-                if os.path.exists(el[2]):
-                    icon = QtGui.QIcon(el[2])
-                    litem = QtWidgets.QListWidgetItem(icon, el[0])
-                    litem.picon = el[2]
-                else:
-                    icon = QtGui.QIcon.fromTheme(el[2])
-                    if icon.isNull():
+            # file_info = QtCore.QFileInfo(exe_path)
+            #if file_info.exists():
+            #
+            # search for the icon by executable
+            icon = QtGui.QIcon.fromTheme(el[1])
+            if icon.isNull() or icon.name() == "":
+                # set the icon by desktop file - not full path
+                icon = QtGui.QIcon.fromTheme(el[2])
+                if icon.isNull() or icon.name() == "":
+                    # set the icon by desktop file - full path
+                    if os.path.exists(el[2]):
+                        icon = QtGui.QIcon(el[2])
+                        if icon.isNull():
+                            # set a generic icon
+                            icon = QtGui.QIcon("icons/none.svg")
+                            litem = QtWidgets.QListWidgetItem(icon, el[0])
+                            litem.picon = "none"
+                        else:
+                            litem = QtWidgets.QListWidgetItem(icon, el[0])
+                            litem.picon = el[2]
+                    else:
+                        # set a generic icon
                         icon = QtGui.QIcon("icons/none.svg")
                         litem = QtWidgets.QListWidgetItem(icon, el[0])
                         litem.picon = "none"
-                    else:
-                        litem = QtWidgets.QListWidgetItem(icon, el[0])
-                        litem.picon = icon.name()
-                # set the exec name as property
-                litem.exec_n = el[1]
-                litem.ppath = el[4]
-                litem.setToolTip(el[3])
-                self.listWidget.addItem(litem)
-                #
+                else:
+                    litem = QtWidgets.QListWidgetItem(icon, el[0])
+                    litem.picon = icon.name()
+            else:
+                litem = QtWidgets.QListWidgetItem(icon, el[0])
+                litem.picon = el[1]
+            
+            # set the exec name as property
+            litem.exec_n = el[1]
+            litem.ppath = el[4]
+            litem.setToolTip(el[3])
+            self.listWidget.addItem(litem)
+            #
         self.listWidget.scrollToTop()
-        
     
     # add the bookmark
     def listItemRightClicked(self, QPos):
@@ -1341,11 +1357,6 @@ if __name__ == '__main__':
         epath = QtCore.QFileInfo(QtCore.QFile(fopen)).absoluteFilePath()
         fileSystemWatcher.addPath(epath)
         fileSystemWatcher.fileChanged.connect(file_changed)
-    # # PERSONALISSIMO
-    # # print("AAA1",os. getcwd())
-    # dprog = "/home/pi/Programmi/qt5simpledock/./qt5simpledock.sh"
-    # os.system("cd {0} && {1} & cd {0}".format(os.getenv("HOME"), dprog))
-    # # print("AAA2",os. getcwd())
     ##### stalonetray
     if use_stalonetray:
         tray = "stalonetray"
