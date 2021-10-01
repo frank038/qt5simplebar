@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.0
+#### v 1.9.1
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -112,28 +112,28 @@ def on_pop_menu(app_dirs_user, app_dirs_system):
     for el in menu:
         cat = el[1]
         if cat == "Multimedia":
-            # label - executable - icon - comment
-            Multimedia.append([el[0],el[2],el[3],el[4]])
+            # label - executable - icon - comment - path
+            Multimedia.append([el[0],el[2],el[3],el[4],el[5]])
         elif cat == "Development":
-            Development.append([el[0],el[2],el[3],el[4]])
+            Development.append([el[0],el[2],el[3],el[4],el[5]])
         elif cat == "Education":
-            Education.append([el[0],el[2],el[3],el[4]])
+            Education.append([el[0],el[2],el[3],el[4],el[5]])
         elif cat == "Game":
-            Game.append([el[0],el[2],el[3],el[4]])
+            Game.append([el[0],el[2],el[3],el[4],el[5]])
         elif cat == "Graphics":
-            Graphics.append([el[0],el[2],el[3],el[4]])
+            Graphics.append([el[0],el[2],el[3],el[4],el[5]])
         elif cat == "Network":
-            Network.append([el[0],el[2],el[3],el[4]])
+            Network.append([el[0],el[2],el[3],el[4],el[5]])
         elif cat == "Office":
-            Office.append([el[0],el[2],el[3],el[4]])
+            Office.append([el[0],el[2],el[3],el[4],el[5]])
         elif cat == "Settings":
-            Settings.append([el[0],el[2],el[3],el[4]])
+            Settings.append([el[0],el[2],el[3],el[4],el[5]])
         elif cat == "System":
-            System.append([el[0],el[2],el[3],el[4]])
+            System.append([el[0],el[2],el[3],el[4],el[5]])
         elif cat == "Utility":
-            Utility.append([el[0],el[2],el[3],el[4]])
+            Utility.append([el[0],el[2],el[3],el[4],el[5]])
         else:
-            Other.append([el[0],el[2],el[3],el[4]])
+            Other.append([el[0],el[2],el[3],el[4],el[5]])
     #
     global menu_is_changed
     if menu_is_changed == 1:
@@ -554,7 +554,7 @@ class menuWin(QtWidgets.QWidget):
                 return True
         return False
     
-    #
+    # category
     def itemClicked(self, QPos):
         item_idx = self.listWidget.indexAt(QPos)
         _item = self.listWidget.itemFromIndex(item_idx)
@@ -607,6 +607,7 @@ class menuWin(QtWidgets.QWidget):
         else:
             self.listWidget.clear()
     
+    # categories
     def populate_menu(self):
         # remove all widgets
         for i in reversed(range(self.rboxBtn.count())): 
@@ -651,7 +652,7 @@ class menuWin(QtWidgets.QWidget):
             btn.clicked.connect(self.on_btn_clicked)
             
     
-    # category button clicked
+    # category button clicked - populate
     def on_btn_clicked(self):
         self.itemBookmark = 0
         cat_name = self.sender().text()
@@ -659,20 +660,27 @@ class menuWin(QtWidgets.QWidget):
         self.listWidget.clear()
         # self.line_edit.clear()
         for el in cat_list:
-            # 0 name - 1 executable - 2 icon - 3 comment
+            # 0 name - 1 executable - 2 icon - 3 comment - 4 path
             exe_path = sh_which(el[1].split(" ")[0])
             file_info = QtCore.QFileInfo(exe_path)
             if file_info.exists():
                 # set the full path first
                 if os.path.exists(el[2]):
                     icon = QtGui.QIcon(el[2])
+                    litem = QtWidgets.QListWidgetItem(icon, el[0])
+                    litem.picon = el[2]
                 else:
                     icon = QtGui.QIcon.fromTheme(el[2])
-                    if not icon.name():
+                    if icon.isNull():
                         icon = QtGui.QIcon("icons/none.svg")
-                litem = QtWidgets.QListWidgetItem(icon, el[0])
+                        litem = QtWidgets.QListWidgetItem(icon, el[0])
+                        litem.picon = "none"
+                    else:
+                        litem = QtWidgets.QListWidgetItem(icon, el[0])
+                        litem.picon = icon.name()
                 # set the exec name as property
                 litem.exec_n = el[1]
+                litem.ppath = el[4]
                 litem.setToolTip(el[3])
                 self.listWidget.addItem(litem)
                 #
@@ -693,15 +701,13 @@ class menuWin(QtWidgets.QWidget):
             if pret == 1:
                 #
                 new_book = str(int(time.time()))
-                icon_name = _item.icon().name()
-                # da fare: trovare path tra le liste dei programmi
-                if not icon_name:
-                    icon_name = "none"
-                # ICON - NAME - EXEC - TOOLTIP
+                icon_name = _item.picon
+                # ICON - NAME - EXEC - TOOLTIP - PATH
                 new_book_content = """{0}
 {1}
 {2}
-{3}""".format(icon_name,_item.text(),_item.exec_n,_item.toolTip() or _item.text())
+{3}
+{4}""".format(icon_name, _item.text(), _item.exec_n, _item.toolTip() or _item.text(), _item.ppath)
                 with open(os.path.join("bookmarks", new_book), "w") as fbook:
                     fbook.write(new_book_content)
         self.listWidget.clearSelection()
@@ -731,13 +737,16 @@ class menuWin(QtWidgets.QWidget):
         # self.p.setWorkingDirectory(os.getenv("HOME"))
         # # self.p.start(str(item.exec_n))
         # self.p.startDetached(str(item.exec_n))
-        os.system("cd {} && {} &".format(os.getenv("HOME"), str(item.exec_n)))
+        if item.ppath:
+            os.system("cd {} && {} & cd {} &".format(str(item.ppath), str(item.exec_n), os.getenv("HOME")))
+        else:
+            os.system("cd {} && {} &".format(os.getenv("HOME"), str(item.exec_n)))
         # close the menu window
         if self.window.mw_is_shown is not None:
             self.window.mw_is_shown.close()
             self.window.mw_is_shown = None
     
-    # the bookmark button
+    # the bookmark button - populate
     def on_pref_clicked(self):
         self.itemBookmark = 1
         self.listWidget.clear()
@@ -756,7 +765,15 @@ class menuWin(QtWidgets.QWidget):
             NAME = el[1].strip("\n")
             EXEC = el[2].strip("\n")
             TOOLTIP = el[3].strip("\n")
-            FILENAME = el[4].strip("\n")
+            # compatibility with previous this program versions
+            if len(el) > 5:
+                PATH_TEMP = el[4].strip("\n")
+                FILENAME = el[5].strip("\n")
+                if PATH_TEMP:
+                    PATH = PATH_TEMP
+            else:
+                FILENAME = el[4].strip("\n")
+                PATH = ""
             #
             exe_path = sh_which(EXEC.split(" ")[0])
             file_info = QtCore.QFileInfo(exe_path)
@@ -765,19 +782,19 @@ class menuWin(QtWidgets.QWidget):
                     icon = QtGui.QIcon(ICON)
                 else:
                     icon = QtGui.QIcon.fromTheme(ICON)
-                    if not icon.name():
+                    if icon.name() == "none":
                         icon = QtGui.QIcon("icons/none.svg")
                 litem = QtWidgets.QListWidgetItem(icon, NAME)
                 litem.exec_n = EXEC
                 litem.setToolTip(TOOLTIP)
                 litem.file_name = FILENAME
+                litem.ppath = PATH
                 self.listWidget.addItem(litem)
                 #
         self.listWidget.sortItems(QtCore.Qt.AscendingOrder)
         self.listWidget.scrollToTop()
         self.listWidget.item(0).setSelected(False)
         
-    
     #
     def listItemRightClickedToRemove(self, QPos):
         self.listMenuR= QtWidgets.QMenu()
@@ -1323,7 +1340,11 @@ if __name__ == '__main__':
         epath = QtCore.QFileInfo(QtCore.QFile(fopen)).absoluteFilePath()
         fileSystemWatcher.addPath(epath)
         fileSystemWatcher.fileChanged.connect(file_changed)
-    #
+    # # PERSONALISSIMO
+    # # print("AAA1",os. getcwd())
+    # dprog = "/home/pi/Programmi/qt5simpledock/./qt5simpledock.sh"
+    # os.system("cd {0} && {1} & cd {0}".format(os.getenv("HOME"), dprog))
+    # # print("AAA2",os. getcwd())
     ##### stalonetray
     if use_stalonetray:
         tray = "stalonetray"
