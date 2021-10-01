@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.1
+#### v 1.9.2
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -603,6 +603,7 @@ class menuWin(QtWidgets.QWidget):
                             # set the exec name as property
                             litem.exec_n = el[1]
                             litem.setToolTip(el[3])
+                            litem.ppath = el[4]
                             self.listWidget.addItem(litem)
         else:
             self.listWidget.clear()
