@@ -130,8 +130,10 @@ class getMenu():
                         ficon = entry.getIcon()
                         # comment
                         fcomment = entry.getComment()
+                        # tryexec
+                        fpath = entry.getPath()
                         ###
-                        self.lists.append([fname, fcategory or "Missed", fexec, ficon, fcomment])
+                        self.lists.append([fname, fcategory or "Missed", fexec, ficon, fcomment, fpath])
                     except:
                         pass
 
