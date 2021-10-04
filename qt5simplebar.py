@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.4
+#### v 1.9.5
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -1304,7 +1304,7 @@ class closeWin(QtWidgets.QWidget):
         if ret:
             self.process = QtCore.QProcess()
             self.process.finished.connect(self.process_finished)
-            self.process.start(shutdown_command)
+            self.process.start(restart_command)
     
     #
     def on_logo(self):
