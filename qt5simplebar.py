@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.5
+#### v 1.9.6
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -195,7 +195,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.abox = QtWidgets.QHBoxLayout()
         self.abox.setContentsMargins(10,0,0,0)
         self.gbox.addLayout(self.abox, 0,0)
-        
+        #
         self.mbutton = QtWidgets.QPushButton(self, flat=True)
         self.mbutton.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.mbutton.setIcon(QtGui.QIcon("icons/menu.png"))
@@ -1006,6 +1006,10 @@ class calendarWin(QtWidgets.QWidget):
     def go_today(self, e):
         to_day = QtCore.QDate().currentDate()
         self.calendar.setSelectedDate(to_day)
+        tomonth = datetime.datetime.now().strftime("%B")
+        toyear = str(datetime.datetime.now().year)
+        self.mlabel.setText(tomonth+" "+toyear)
+        
     #
     def on_prev_month(self):
         thisMonth = QtCore.QDate().currentDate().month()
@@ -1383,6 +1387,12 @@ if __name__ == '__main__':
         epath = QtCore.QFileInfo(QtCore.QFile(fopen)).absoluteFilePath()
         fileSystemWatcher.addPath(epath)
         fileSystemWatcher.fileChanged.connect(file_changed)
+    # # PERSONALISSIMO
+    # # print("AAA1",os. getcwd())
+    # dprog = "/home/pi/Programmi/qt5simpledock/./qt5simpledock.sh"
+    # #os.system("cd {0} && {1} & cd {0}".format(os.getenv("HOME"), dprog))
+    # os.system("cd {0} && {1} & cd {0}".format("/home/pi", dprog))
+    # # print("AAA2",os. getcwd())
     ##### stalonetray
     if use_stalonetray:
         tray = "stalonetray"
