@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.6
+#### v 1.9.7
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -537,6 +537,9 @@ class menuWin(QtWidgets.QWidget):
         self.emulate_clicked(self.pref, 100)
         self.pref.setChecked(True)
         #
+        if item_highlight_color:
+            ics = "QListWidget:item::hover:!pressed { "+"background-color: {}".format(item_highlight_color)+";}"
+            self.listWidget.setStyleSheet(ics)
         self.listWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.listWidget.customContextMenuRequested.connect(self.itemClicked)
         # which button has been pressed
@@ -1066,6 +1069,9 @@ class Calendar(QtWidgets.QCalendarWidget):
         self.events = c_dict
         self.cvbox = vbox
         self.color3 = QtGui.QColor(calendar_appointment_day_color)
+        if item_highlight_color:
+            ics = "QTableView{selection-background-color: "+"{}".format(item_highlight_color)+"}"
+            self.setStyleSheet(ics)
         # day in the month
         self.clicked.connect(self.showDate)
         # year or month changed by user
@@ -1387,12 +1393,6 @@ if __name__ == '__main__':
         epath = QtCore.QFileInfo(QtCore.QFile(fopen)).absoluteFilePath()
         fileSystemWatcher.addPath(epath)
         fileSystemWatcher.fileChanged.connect(file_changed)
-    # # PERSONALISSIMO
-    # # print("AAA1",os. getcwd())
-    # dprog = "/home/pi/Programmi/qt5simpledock/./qt5simpledock.sh"
-    # #os.system("cd {0} && {1} & cd {0}".format(os.getenv("HOME"), dprog))
-    # os.system("cd {0} && {1} & cd {0}".format("/home/pi", dprog))
-    # # print("AAA2",os. getcwd())
     ##### stalonetray
     if use_stalonetray:
         tray = "stalonetray"

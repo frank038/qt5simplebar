@@ -24,6 +24,8 @@ theme_style="Fusion"
 icon_theme=""
 # in the form "#XXXXXX" or "rgb(X, X, X)" or "colour name"
 scroll_handle_col="#B5B5B5"
+# highlight color - in the form "#rrggbb or "" for default
+item_highlight_color="#B5B5B5"
 # show the name of the day: 0 no - 1 yes
 day_name=1
 # the calendar to read
