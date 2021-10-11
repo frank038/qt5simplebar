@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.7
+#### v 1.9.8
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -168,6 +168,9 @@ class showDialog(QtWidgets.QDialog):
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
         
+        self.adjustSize()
+        self.updateGeometry()
+        self.resize(self.sizeHint())
         # geometry of the main window
         qr = self.frameGeometry()
         # center point of screen
