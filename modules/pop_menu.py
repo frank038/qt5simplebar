@@ -78,9 +78,15 @@ class getMenu():
         self.info_desktop = []
         # list of all desktop files found
         self.lists = []
-        # fill self.info_desktop
-        self.fpop(app_dirs_system)
+        ### fill self.info_desktop
+        self.desktops_user = []
         self.fpop(app_dirs_user)
+        # desktop files in the user dirs
+        for ddir in app_dirs_user:
+            if os.path.exists(ddir):
+                self.desktops_user.extend(os.listdir(ddir))
+        #
+        self.fpop(app_dirs_system)
         
     # return the lists
     def retList(self):
@@ -95,6 +101,9 @@ class getMenu():
                 for ffile in os.listdir(ddir):
                     if not ffile.lower().endswith(".desktop"):
                         continue
+                    if self.desktops_user:
+                        if ffile in self.desktops_user:
+                            continue
                     #
                     fpath = os.path.join(ddir, ffile)
                     try:
