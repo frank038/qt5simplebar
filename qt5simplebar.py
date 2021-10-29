@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.8.5
+#### v 1.9.9
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -266,9 +266,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.mw_is_shown = None
         # for the exit window
         self.cwin_is_shown = None
-        #
-        # calendar list events
-        self.list_events = list_events_all
+
     
     # close all the menu if the bar is selected
     def mousePressEvent(self, event):
@@ -600,7 +598,7 @@ class menuWin(QtWidgets.QWidget):
                 for el in globals()[ell]:
                     if (text.casefold() in el[1].casefold()) or (text.casefold() in el[3].casefold()):
                         exe_path = sh_which(el[1].split(" ")[0])
-                        # file_info = QtCore.QFileInfo(exe_path)
+                        # 
                         if exe_path:
                             # search for the icon by executable
                             icon = QtGui.QIcon.fromTheme(el[1])
@@ -696,7 +694,6 @@ class menuWin(QtWidgets.QWidget):
         for el in cat_list:
             # 0 name - 1 executable - 2 icon - 3 comment - 4 path
             exe_path = sh_which(el[1].split(" ")[0])
-            # file_info = QtCore.QFileInfo(exe_path)
             #
             if exe_path:
                 # search for the icon by executable
@@ -967,7 +964,7 @@ class calendarWin(QtWidgets.QWidget):
         thisYear = QtCore.QDate().currentDate().year()
         l_e = []
         # 
-        for ev in self.window.list_events:
+        for ev in list_events_all:
             tdata = ev.DTSTART
             ttime = ("{}:{}".format(tdata[9:11], tdata[11:13]))
             tdate = QtCore.QDate.fromString(ev.DTSTART[0:8], 'yyyyMMdd')
@@ -1352,6 +1349,7 @@ if __name__ == '__main__':
     window.setGeometry(0, 0, WINW, WINH)
     window.setAttribute(QtCore.Qt.WA_X11NetWmWindowTypeDock)
     window.setWindowFlags(window.windowFlags() | QtCore.Qt.WindowDoesNotAcceptFocus)
+    # window.setWindowFlags(window.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint | QtCore.Qt.WindowDoesNotAcceptFocus)
     window.show()
     # the main window height (depending also on font size)
     WINH = window.size().height()
@@ -1363,7 +1361,7 @@ if __name__ == '__main__':
                            _display.intern_atom('CARDINAL'), 32,
                            [0, 0, WINH, 0, 0, 0, 0, 0, x, x+WINW-1, 0, 0],
                            X.PropModeReplace)
-    #_window.set_wm_state(_display.intern_atom('_NET_WM_STATE_SKIP_TASKBAR'))
+    # _window.set_wm_state(_display.intern_atom('_NET_WM_STATE_SKIP_TASKBAR'))
     _display.sync()
     # set new style globally
     if theme_style:
@@ -1389,6 +1387,8 @@ if __name__ == '__main__':
     fileSystemWatcher.directoryChanged.connect(directory_changed)
     
     def file_changed(efile):
+        global list_events_all
+        list_events_all = []
         get_events()
     
     # check for changes in the calendar file
