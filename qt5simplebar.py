@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.9
+#### v 1.9.10
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -737,6 +737,10 @@ class menuWin(QtWidgets.QWidget):
     def listItemRightClicked(self, QPos):
         self.listMenu= QtWidgets.QMenu()
         item_b = self.listMenu.addAction("Add to bookmark")
+        if SEND_TO_DESKTOP:
+            item_d = self.listMenu.addAction("Send to the {}".format(DESKTOP_NAME))
+        else:
+            item_d = "None"
         action = self.listMenu.exec_(self.listWidget.mapToGlobal(QPos))
         if action == item_b:
             item_idx = self.listWidget.indexAt(QPos)
@@ -756,6 +760,22 @@ class menuWin(QtWidgets.QWidget):
 {4}""".format(icon_name, _item.text(), _item.exec_n, _item.toolTip() or _item.text(), _item.ppath)
                 with open(os.path.join("bookmarks", new_book), "w") as fbook:
                     fbook.write(new_book_content)
+        # send to the Desktop action
+        elif action == item_d:
+            item_idx = self.listWidget.indexAt(QPos)
+            _item = self.listWidget.itemFromIndex(item_idx)
+            item_name = _item.text()
+            item_icon = _item.picon
+            item_exec = _item.exec_n
+            # create a desktop file
+            dest_file = os.path.join(os.path.expanduser("~"), DESKTOP_NAME, item_name)
+            with open(dest_file, "w") as ff:
+                ff.write("[Desktop Entry]\n")
+                ff.write("Type=Application\n")
+                ff.write("Name={}\n".format(item_name))
+                ff.write("Exec={}\n".format(item_exec))
+                ff.write("Icon={}\n".format(item_icon))
+        #
         self.listWidget.clearSelection()
         self.listWidget.clearFocus()
     

@@ -67,3 +67,7 @@ custom_command2_icon="icons/Missed.svg"
 custom_command3=""
 custom_command3_name=""
 custom_command3_icon="icons/Missed.svg"
+# show this action in the menu: 0 no - 1 yes
+SEND_TO_DESKTOP=0
+# desktop name
+DESKTOP_NAME="Desktop"
