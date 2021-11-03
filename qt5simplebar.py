@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.10
+#### v 1.9.11
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -769,7 +769,7 @@ class menuWin(QtWidgets.QWidget):
             item_exec = _item.exec_n
             # create a desktop file
             dest_file = os.path.join(os.path.expanduser("~"), DESKTOP_NAME, item_name)
-            with open(dest_file, "w") as ff:
+            with open(dest_file+".desktop", "w") as ff:
                 ff.write("[Desktop Entry]\n")
                 ff.write("Type=Application\n")
                 ff.write("Name={}\n".format(item_name))
