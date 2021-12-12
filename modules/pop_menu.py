@@ -64,8 +64,8 @@ class getMenu():
         self.system_extended_categories = ["FileManager","TerminalEmulator","FileSystem",
                                      "Monitor","Core"]
         
-        # arguments in the exec fiels
-        self.execArgs = [" %f", " %F", " %u", " %U", " %d", " %D", " %n", " %N", " %k", " %v"]
+        # # arguments in the exec fiels
+        # self.execArgs = [" %f", " %F", " %u", " %U", " %d", " %D", " %n", " %N", " %k", " %v"]
         
         # the default
         self.locale_lang = "en"
@@ -130,11 +130,12 @@ class getMenu():
                         if fexec[0:5] == "$HOME":
                             fexec = "~"+fexec[5:]
                         # check for arguments and remove them
-                        # if fexec[-3:] in self.execArgs:
-                            # fexec = fexec[:-3]
-                        for aargs in self.execArgs:
-                            if aargs in fexec:
-                                fexec = fexec.strip(aargs)
+                        # # if fexec[-3:] in self.execArgs:
+                            # # fexec = fexec[:-3]
+                        # for aargs in self.execArgs:
+                            # if aargs in fexec:
+                                # fexec = fexec.strip(aargs)
+                        fexec = fexec.split(" ")[0]
                         # icon
                         ficon = entry.getIcon()
                         # comment
