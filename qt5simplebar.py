@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.11.1
+#### v 1.9.11.2
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
