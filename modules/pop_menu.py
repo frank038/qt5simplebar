@@ -64,8 +64,9 @@ class getMenu():
         self.system_extended_categories = ["FileManager","TerminalEmulator","FileSystem",
                                      "Monitor","Core"]
         
-        # # arguments in the exec fiels
-        self.execArgs = [" %f", " %F", " %u", " %U", " %d", " %D", " %n", " %N", " %k", " %v"]
+        # arguments in the exec fiels
+        # self.execArgs = [" %f", " %F", " %u", " %U", " %d", " %D", " %n", " %N", " %k", " %v"]
+        self.execArgs = ["%f", "%F", "%u", "%U", "%d", "%D", "%n", "%N", "%k", "%v"]
         
         # the default
         self.locale_lang = "en"
