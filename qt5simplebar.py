@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.11.3
+#### v 1.9.12
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -598,7 +598,7 @@ class menuWin(QtWidgets.QWidget):
                 for el in globals()[ell]:
                     if (text.casefold() in el[1].casefold()) or (text.casefold() in el[3].casefold()):
                         exe_path = sh_which(el[1].split(" ")[0])
-                        # 
+                        # file_info = QtCore.QFileInfo(exe_path)
                         if exe_path:
                             # search for the icon by executable
                             icon = QtGui.QIcon.fromTheme(el[1])
@@ -688,12 +688,17 @@ class menuWin(QtWidgets.QWidget):
     def on_btn_clicked(self):
         self.itemBookmark = 0
         cat_name = self.sender().text()
+        # remove amperand eventually added by alien programs
+        if "&" in cat_name:
+            cat_name = cat_name.strip("&")
+        #
         cat_list = globals()[cat_name]
         self.listWidget.clear()
         # self.line_edit.clear()
         for el in cat_list:
             # 0 name - 1 executable - 2 icon - 3 comment - 4 path
             exe_path = sh_which(el[1].split(" ")[0])
+            # file_info = QtCore.QFileInfo(exe_path)
             #
             if exe_path:
                 # search for the icon by executable
@@ -1381,7 +1386,7 @@ if __name__ == '__main__':
                            _display.intern_atom('CARDINAL'), 32,
                            [0, 0, WINH, 0, 0, 0, 0, 0, x, x+WINW-1, 0, 0],
                            X.PropModeReplace)
-    # _window.set_wm_state(_display.intern_atom('_NET_WM_STATE_SKIP_TASKBAR'))
+    #_window.set_wm_state(_display.intern_atom('_NET_WM_STATE_SKIP_TASKBAR'))
     _display.sync()
     # set new style globally
     if theme_style:
