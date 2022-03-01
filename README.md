@@ -9,7 +9,7 @@ This program needs:
 - pyqt5
 - python3-xdg
 - Xorg
-- stalonetray (optional)
+- stalonetray (optional - not integrated in the program)
 
 Some options can be changed in the cfg.py config file.
 
