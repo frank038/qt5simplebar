@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.12
+#### v 1.9.13
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -180,6 +180,35 @@ class showDialog(QtWidgets.QDialog):
         # top left of rectangle becomes top left of window centering it
         self.move(qr.topLeft())
 
+# type - message - parent
+class MyDialog(QtWidgets.QMessageBox):
+    def __init__(self, *args):
+        super(MyDialog, self).__init__(args[-1])
+        if args[0] == "Info":
+            self.setIcon(QtWidgets.QMessageBox.Information)
+            self.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        elif args[0] == "Error":
+            self.setIcon(QtWidgets.QMessageBox.Critical)
+            self.setStandardButtons(QtWidgets.QMessageBox.Ok)
+        elif args[0] == "Question":
+            self.setIcon(QtWidgets.QMessageBox.Question)
+            self.setStandardButtons(QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.Cancel)
+        self.setWindowIcon(QtGui.QIcon("icons/file-manager-red.svg"))
+        self.setWindowTitle(args[0])
+        self.resize(DIALOGWIDTH,300)
+        self.setText(args[1])
+        retval = self.exec_()
+    
+    def event(self, e):
+        result = QtWidgets.QMessageBox.event(self, e)
+        #
+        self.setMinimumHeight(0)
+        self.setMaximumHeight(16777215)
+        self.setMinimumWidth(0)
+        self.setMaximumWidth(16777215)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        # 
+        return result
 
 # main class
 class MainWin(QtWidgets.QMainWindow):
@@ -688,7 +717,7 @@ class menuWin(QtWidgets.QWidget):
     def on_btn_clicked(self):
         self.itemBookmark = 0
         cat_name = self.sender().text()
-        # remove amperand eventually added by alien programs
+        # remove ampersand eventually added by alien programs
         if "&" in cat_name:
             cat_name = cat_name.strip("&")
         #
@@ -1001,6 +1030,7 @@ class calendarWin(QtWidgets.QWidget):
         self.calendar.setContentsMargins(0,0,0,0)
         self.calendar.setNavigationBarVisible(False)
         self.calendar.setVerticalHeaderFormat(QtWidgets.QCalendarWidget.NoVerticalHeader)
+        self.calendar.currentPageChanged.connect(self.calendar_month_changed)
         self.hbox.addWidget(self.calendar)
         self.show()
         #
@@ -1029,7 +1059,12 @@ class calendarWin(QtWidgets.QWidget):
                 self.window.cw_is_shown = None
                 return True
         return False
-        
+    
+    # selecting a day in the calendar could change the month view
+    def calendar_month_changed(self, cyear, cmonth):
+        tomonth = datetime.datetime(cyear, cmonth, 1).strftime("%B")
+        self.mlabel.setText(tomonth+" "+str(cyear))
+    
     #
     def go_today(self, e):
         to_day = QtCore.QDate().currentDate()
@@ -1079,10 +1114,19 @@ class calendarWin(QtWidgets.QWidget):
         #
         
 class ClickLabel(QtWidgets.QLabel):
-    clicked = QtCore.pyqtSignal()
+    # clicked = QtCore.pyqtSignal()
     
     def mouseDoubleClickEvent(self, event):
-        self.clicked.emit()
+        if event_command:
+            try:
+                # output format: 20220301
+                cdate = self.cdate.toString('yyyyMMdd')
+                subprocess.Popen([event_command, cdate])
+            except:
+                pass
+            # except Exception as E:
+                # MyDialog("Error", str(E), self)
+        # self.clicked.emit()
         QtWidgets.QLabel.mousePressEvent(self, event)      
 
 # 
@@ -1091,6 +1135,7 @@ class Calendar(QtWidgets.QCalendarWidget):
     # constructor
     def __init__(self, parent=None, c_dict=None, vbox=None):
         super(Calendar, self).__init__(parent)
+        self.parent = parent
         self.events = c_dict
         self.cvbox = vbox
         self.color3 = QtGui.QColor(calendar_appointment_day_color)
@@ -1124,6 +1169,7 @@ class Calendar(QtWidgets.QCalendarWidget):
             if item[0] == date:
                 label = ClickLabel()
                 label.setText(appointment_char+" "+item[1])
+                label.cdate = item[0]
                 label.setWordWrap(True)
                 label.setStyleSheet("""
                       border: 3px solid;                                                                                                            

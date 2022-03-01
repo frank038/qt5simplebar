@@ -48,6 +48,10 @@ calendar_label_font_italic=0
 calendar_label_font_color=""
 #
 appointment_char="✔"
+# commad to launch after a double click on an event, or leave "" empty
+event_command=""
+# dialog width
+DIALOGWIDTH=300
 #
 shutdown_command="shutdown -P now"
 #
