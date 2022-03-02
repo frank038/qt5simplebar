@@ -50,6 +50,8 @@ calendar_label_font_color=""
 appointment_char="✔"
 # commad to launch after a double click on an event, or leave "" empty
 event_command=""
+# command to execute after double clicking a date in the calendar
+date_command=event_command
 # dialog width
 DIALOGWIDTH=300
 #

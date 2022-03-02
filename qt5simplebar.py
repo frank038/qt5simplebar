@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.13
+#### v 1.9.14
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -193,7 +193,7 @@ class MyDialog(QtWidgets.QMessageBox):
         elif args[0] == "Question":
             self.setIcon(QtWidgets.QMessageBox.Question)
             self.setStandardButtons(QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.Cancel)
-        self.setWindowIcon(QtGui.QIcon("icons/file-manager-red.svg"))
+        # self.setWindowIcon(QtGui.QIcon("icons/file-manager-red.svg"))
         self.setWindowTitle(args[0])
         self.resize(DIALOGWIDTH,300)
         self.setText(args[1])
@@ -1142,8 +1142,10 @@ class Calendar(QtWidgets.QCalendarWidget):
         if item_highlight_color:
             ics = "QTableView{selection-background-color: "+"{}".format(item_highlight_color)+"}"
             self.setStyleSheet(ics)
-        # day in the month
+        # day in the month - single click
         self.clicked.connect(self.showDate)
+        # day in the month - double click
+        self.activated.connect(self.activatedDate)
         # year or month changed by user
         self.currentPageChanged.connect(self.pageChanded)
         # today
@@ -1181,6 +1183,18 @@ class Calendar(QtWidgets.QCalendarWidget):
     # day of the month changed by user
     def showDate(self, date):
         self.popCalEv(date)
+    
+    #
+    def activatedDate(self, date):
+        if date_command:
+            try:
+                # output format: 20220301
+                cdate = date.toString('yyyyMMdd')
+                subprocess.Popen([date_command, cdate])
+            except:
+                pass
+            # except Exception as E:
+                # MyDialog("Error", str(E), self)
     
     def pageChanded(self, year, month):
         date = self.selectedDate()
