@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.14
+#### v 1.9.15
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -23,6 +23,7 @@ fopen = calendar_file
 
 class sEvent:
     SUMMARY=None
+    DESCRIPTION=None
     DTSTART=None
 
 list_events_all = []
@@ -51,6 +52,9 @@ def get_events():
             
         elif el.strip("\n")[0:8] == "SUMMARY:":
             s_event.SUMMARY = el.strip("\n")[8:]
+        
+        elif el.strip("\n")[0:12] == "DESCRIPTION:":
+            s_event.DESCRIPTION = el.strip("\n")[12:]
         
         elif el.strip("\n")[0:8] == "DTSTART:":
             s_event.DTSTART = el.strip("\n")[8:]
@@ -1022,7 +1026,7 @@ class calendarWin(QtWidgets.QWidget):
             tdata = ev.DTSTART
             ttime = ("{}:{}".format(tdata[9:11], tdata[11:13]))
             tdate = QtCore.QDate.fromString(ev.DTSTART[0:8], 'yyyyMMdd')
-            l_e.append((tdate, ttime+" "+ev.SUMMARY))
+            l_e.append((tdate, ttime+" "+ev.SUMMARY, ev.DESCRIPTION))
         #
         l_e.sort()
         ###
@@ -1178,6 +1182,7 @@ class Calendar(QtWidgets.QCalendarWidget):
                       border-radius: 18%;
                       border-color: {};                                                                                                                
                       """.format(appointment_border_color)) 
+                label.setToolTip(item[2])
                 self.cvbox.addWidget(label)
     
     # day of the month changed by user
