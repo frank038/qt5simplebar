@@ -28,6 +28,8 @@ scroll_handle_col="#B5B5B5"
 item_highlight_color="#B5B5B5"
 # show the name of the day: 0 no - 1 yes
 day_name=1
+# time in AM/PM format: 0 no - 1 yes
+USE_AP = 0
 # the calendar to read
 calendar_file=""
 # in the form "#XXXXXX" or "colour name"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.15
+#### v 1.9.16
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -256,7 +256,10 @@ class MainWin(QtWidgets.QMainWindow):
         self.tlabel.setAlignment(QtCore.Qt.AlignCenter)
         self.cbox.addWidget(self.tlabel)
         #
-        cur_time = QtCore.QTime.currentTime().toString("hh:mm")
+        if USE_AP:
+	        cur_time = QtCore.QTime.currentTime().toString("hh:mm ap")
+        else:
+            cur_time = QtCore.QTime.currentTime().toString("hh:mm")
         if day_name:
             curr_date = QtCore.QDate.currentDate().toString("ddd d")
             self.tlabel.setText(" "+curr_date+"  "+cur_time+" ")
@@ -327,7 +330,11 @@ class MainWin(QtWidgets.QMainWindow):
     
     # label time    
     def update_label(self):
-        cur_time = QtCore.QTime.currentTime().toString('hh:mm')
+        if USE_AP:
+	        cur_time = QtCore.QTime.currentTime().toString("hh:mm ap")
+        else:
+            cur_time = QtCore.QTime.currentTime().toString("hh:mm")
+        #
         if day_name:
             curr_date = QtCore.QDate.currentDate().toString("ddd d")
             self.tlabel.setText(" "+curr_date+"  "+cur_time+" ")
