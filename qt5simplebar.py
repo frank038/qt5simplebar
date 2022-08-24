@@ -257,7 +257,7 @@ class MainWin(QtWidgets.QMainWindow):
         self.cbox.addWidget(self.tlabel)
         #
         if USE_AP:
-	        cur_time = QtCore.QTime.currentTime().toString("hh:mm ap")
+            cur_time = QtCore.QTime.currentTime().toString("hh:mm ap")
         else:
             cur_time = QtCore.QTime.currentTime().toString("hh:mm")
         if day_name:
@@ -331,7 +331,7 @@ class MainWin(QtWidgets.QMainWindow):
     # label time    
     def update_label(self):
         if USE_AP:
-	        cur_time = QtCore.QTime.currentTime().toString("hh:mm ap")
+            cur_time = QtCore.QTime.currentTime().toString("hh:mm ap")
         else:
             cur_time = QtCore.QTime.currentTime().toString("hh:mm")
         #
