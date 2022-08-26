@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.16
+#### v 1.9.17
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -505,10 +505,12 @@ class menuWin(QtWidgets.QWidget):
         ###########
         self.line_edit = QtWidgets.QLineEdit("")
         self.line_edit.setFrame(True)
-        self.line_edit.setStyleSheet("background: white")
+        # self.line_edit.setStyleSheet("color: black; background-color: white")
         self.line_edit.textChanged.connect(self.on_line_edit)
+        self.line_edit.setClearButtonEnabled(True)
         self.lbox.addWidget(self.line_edit)
-        self.line_edit.setFocus(True)
+        # self.line_edit.setFocus(True)
+        self.listWidget.setFocus(True)
         
         ##### right box
         self.rbox = QtWidgets.QVBoxLayout()
@@ -777,6 +779,7 @@ class menuWin(QtWidgets.QWidget):
                 self.listWidget.addItem(litem)
                 #
         self.listWidget.scrollToTop()
+        self.listWidget.setFocus(True)
     
     # add the bookmark
     def listItemRightClicked(self, QPos):
@@ -823,6 +826,7 @@ class menuWin(QtWidgets.QWidget):
         #
         self.listWidget.clearSelection()
         self.listWidget.clearFocus()
+        self.listWidget.setFocus(True)
     
     #
     def check_bookmarks(self, _item):
@@ -904,7 +908,9 @@ class menuWin(QtWidgets.QWidget):
                 #
         self.listWidget.sortItems(QtCore.Qt.AscendingOrder)
         self.listWidget.scrollToTop()
-        self.listWidget.item(0).setSelected(False)
+        if self.listWidget.count():
+            self.listWidget.item(0).setSelected(False)
+            self.listWidget.setFocus(True)
         
     #
     def listItemRightClickedToRemove(self, QPos):
@@ -922,6 +928,7 @@ class menuWin(QtWidgets.QWidget):
                 pass
         self.listWidget.clearSelection()
         self.listWidget.clearFocus()
+        self.listWidget.setFocus(True)
 
 
 # popup per calendar

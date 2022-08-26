@@ -2,5 +2,5 @@
 
 thisdir=$(dirname "$0")
 cd $thisdir
-./qt5simplebar.py &
+python3 qt5simplebar.py &
 cd $HOME
