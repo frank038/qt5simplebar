@@ -56,6 +56,8 @@ event_command=""
 date_command=event_command
 # dialog width
 DIALOGWIDTH=300
+# track screen resolution changes: 0 no - 1 yes
+SCRN_RES = 1
 #
 shutdown_command="shutdown -P now"
 #

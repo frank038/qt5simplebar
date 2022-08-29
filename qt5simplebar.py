@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 1.9.17
+#### v 2.0
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -10,6 +10,11 @@ import subprocess, signal
 from cfg import *
 sys.path.append("modules")
 from pop_menu import getMenu
+
+if SCRN_RES:
+    display = Display()
+    root = display.screen().root
+    root.change_attributes(event_mask=X.StructureNotifyMask)
 
 # width and height of the program
 WINW = 0
@@ -214,6 +219,26 @@ class MyDialog(QtWidgets.QMessageBox):
         # 
         return result
 
+# screen resolution changed
+class winThread(QtCore.QThread):
+    
+    sig = QtCore.pyqtSignal(list)
+    
+    def __init__(self, display, parent=None):
+        super(winThread, self).__init__(parent)
+        self.display = display
+        self.root = self.display.screen().root
+        #
+        self.win_l = []
+        self.root.change_attributes(event_mask=X.PropertyChangeMask)
+        
+    #
+    def run(self):
+        while True:
+            event = display.next_event()
+            if event.type == X.ConfigureNotify:
+                self.sig.emit([root.get_geometry().width, root.get_geometry().height])
+    
 # main class
 class MainWin(QtWidgets.QMainWindow):
     
@@ -302,7 +327,23 @@ class MainWin(QtWidgets.QMainWindow):
         self.mw_is_shown = None
         # for the exit window
         self.cwin_is_shown = None
-
+        ########
+        if SCRN_RES:
+            self.mythread = winThread(Display())
+            self.mythread.sig.connect(self.threadslot)
+            self.mythread.start()
+    
+    
+    def threadslot(self, data):
+        if data:
+            global WINW
+            global WINH
+            NWD, NHD = data
+            if NWD != WINW:
+                WINW = NWD
+                window.setGeometry(0, 0, WINW, WINH)
+                self.updateGeometry()
+        
     
     # close all the menu if the bar is selected
     def mousePressEvent(self, event):
