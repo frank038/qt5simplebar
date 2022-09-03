@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.0
+#### v 2.1
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -626,9 +626,10 @@ class menuWin(QtWidgets.QWidget):
             self.listWidget.setStyleSheet(ics)
         self.listWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.listWidget.customContextMenuRequested.connect(self.itemClicked)
-        # which button has been pressed
+        # the bookmark button has been pressed
         self.itemBookmark = 1
-        #
+        # while an item is been searching
+        self.itemSearching = 0
         self.installEventFilter(self)
         #
         # self.setAttribute(QtCore.Qt.WA_X11NetWmWindowTypeDock)
@@ -641,8 +642,9 @@ class menuWin(QtWidgets.QWidget):
                 return True
         return False
     
-    # category
+    # button category clicked
     def itemClicked(self, QPos):
+        self.itemSearching = 0
         item_idx = self.listWidget.indexAt(QPos)
         _item = self.listWidget.itemFromIndex(item_idx)
         if _item == None:
@@ -666,6 +668,8 @@ class menuWin(QtWidgets.QWidget):
     
     # seeking in the program lists
     def search_program(self, text):
+        self.itemBookmark = 0
+        self.itemSearching = 1
         if len(text) == 0:
             self.emulate_clicked(self.pref, 100)
             self.pref.setChecked(True)
@@ -722,7 +726,7 @@ class menuWin(QtWidgets.QWidget):
         else:
             self.listWidget.clear()
     
-    # categories
+    # populate the main categories
     def populate_menu(self):
         # remove all widgets
         for i in reversed(range(self.rboxBtn.count())): 
@@ -767,17 +771,26 @@ class menuWin(QtWidgets.QWidget):
             btn.clicked.connect(self.on_btn_clicked)
             
     
-    # category button clicked - populate
+    # category button clicked - populate the selected category
     def on_btn_clicked(self):
+        # clear the search field
+        if self.line_edit.text():
+            self.line_edit.disconnect()
+            self.line_edit.clear()
+            self.line_edit.setClearButtonEnabled(False)
+            self.line_edit.setClearButtonEnabled(True)
+            self.line_edit.textChanged.connect(self.on_line_edit)
+            self.itemSearching = 0
+        #
         self.itemBookmark = 0
         cat_name = self.sender().text()
-        # remove ampersand eventually added by alien programs
+        # remove the ampersand eventually added by alien programs
         if "&" in cat_name:
             cat_name = cat_name.strip("&")
         #
         cat_list = globals()[cat_name]
         self.listWidget.clear()
-        # self.line_edit.clear()
+        # 
         for el in cat_list:
             # 0 name - 1 executable - 2 icon - 3 comment - 4 path
             exe_path = sh_which(el[1].split(" ")[0])
@@ -822,33 +835,35 @@ class menuWin(QtWidgets.QWidget):
         self.listWidget.scrollToTop()
         self.listWidget.setFocus(True)
     
-    # add the bookmark
+    # add the bookmark after right click
     def listItemRightClicked(self, QPos):
+        # check if a bookmark is already present
+        item_idx = self.listWidget.indexAt(QPos)
+        _item = self.listWidget.itemFromIndex(item_idx)
+        pret = self.check_bookmarks(_item)
+        #
         self.listMenu= QtWidgets.QMenu()
-        item_b = self.listMenu.addAction("Add to bookmark")
+        if pret == 1:
+            item_b = self.listMenu.addAction("Add to bookmark")
         if SEND_TO_DESKTOP:
             item_d = self.listMenu.addAction("Send to the {}".format(DESKTOP_NAME))
         else:
             item_d = "None"
         action = self.listMenu.exec_(self.listWidget.mapToGlobal(QPos))
-        if action == item_b:
+        if pret == 1 and action == item_b:
             item_idx = self.listWidget.indexAt(QPos)
             _item = self.listWidget.itemFromIndex(item_idx)
-            # check if a bookmark is already present
-            pret = 1
-            pret = self.check_bookmarks(_item)
-            if pret == 1:
-                #
-                new_book = str(int(time.time()))
-                icon_name = _item.picon
-                # ICON - NAME - EXEC - TOOLTIP - PATH
-                new_book_content = """{0}
+            # 
+            new_book = str(int(time.time()))
+            icon_name = _item.picon
+            # ICON - NAME - EXEC - TOOLTIP - PATH
+            new_book_content = """{0}
 {1}
 {2}
 {3}
 {4}""".format(icon_name, _item.text(), _item.exec_n, _item.toolTip() or _item.text(), _item.ppath)
-                with open(os.path.join("bookmarks", new_book), "w") as fbook:
-                    fbook.write(new_book_content)
+            with open(os.path.join("bookmarks", new_book), "w") as fbook:
+                fbook.write(new_book_content)
         # send to the Desktop action
         elif action == item_d:
             item_idx = self.listWidget.indexAt(QPos)
@@ -869,8 +884,9 @@ class menuWin(QtWidgets.QWidget):
         self.listWidget.clearFocus()
         self.listWidget.setFocus(True)
     
-    #
+    # check whether the bookmark already exists
     def check_bookmarks(self, _item):
+        is_found = 0
         if _item == None:
             return 1
         list_prog = os.listdir("bookmarks")
@@ -883,9 +899,12 @@ class menuWin(QtWidgets.QWidget):
                 cnt = f.readlines()
             #
             if cnt[2].strip("\n") == _item.exec_n:
-                return 3
-            else:
-                return 1
+                is_found = 1
+        #
+        if is_found:
+            return 3
+        else:
+            return 1
     
     # execute the program from the menu
     def listwidgetclicked(self, item):
@@ -904,6 +923,11 @@ class menuWin(QtWidgets.QWidget):
     
     # the bookmark button - populate
     def on_pref_clicked(self):
+        # clear the search field
+        if self.line_edit.text():
+            self.line_edit.clear()
+            self.itemSearching = 0
+        #
         self.itemBookmark = 1
         self.listWidget.clear()
         # self.line_edit.clear()
