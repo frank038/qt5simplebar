@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.1
+#### v 2.2
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -276,8 +276,9 @@ class MainWin(QtWidgets.QMainWindow):
         tfont.setItalic(calendar_label_font_italic)
         self.tlabel.setFont(tfont)
         if calendar_label_font_color:
-            self.tlabel.setStyleSheet("color: {}".format(calendar_label_font_color))
-        self.tlabel.setStyleSheet("QLabel::hover { background-color: lightgrey; border: 2px lightgrey; border-radius: 15px;}")
+            self.tlabel.setStyleSheet("QLabel {0} color: {1}; {2} QLabel::hover {0} background-color: lightgrey; border: 2px lightgrey; border-radius: 15px;{2}".format("{", calendar_label_font_color, "}"))
+        else:
+            self.tlabel.setStyleSheet("QLabel::hover { background-color: lightgrey; border: 2px lightgrey; border-radius: 15px;}")
         self.tlabel.setAlignment(QtCore.Qt.AlignCenter)
         self.cbox.addWidget(self.tlabel)
         #
@@ -1256,11 +1257,11 @@ class Calendar(QtWidgets.QCalendarWidget):
                 label.setText(appointment_char+" "+item[1])
                 label.cdate = item[0]
                 label.setWordWrap(True)
-                label.setStyleSheet("""
+                label.setStyleSheet(""" QLabel {0}
                       border: 3px solid;                                                                                                            
                       border-radius: 18%;
-                      border-color: {};                                                                                                                
-                      """.format(appointment_border_color)) 
+                      border-color: {1}; {2}                                                                                                                
+                      """.format("{", appointment_border_color, "}")) 
                 label.setToolTip(item[2])
                 self.cvbox.addWidget(label)
     
@@ -1406,6 +1407,7 @@ class closeWin(QtWidgets.QWidget):
         if logout_command:
             rest_logo = QtGui.QIcon("icons/system-logout.svg")
             self.logo = QtWidgets.QPushButton(rest_logo, "Logout")
+            self.logo.setFlat(True)
             self.logo.clicked.connect(self.on_logo)
             self.mbox.addWidget(self.logo)
             self.logo.setStyleSheet(csa)
