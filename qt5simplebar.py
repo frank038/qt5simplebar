@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.2
+#### v 2.3
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -567,6 +567,7 @@ class menuWin(QtWidgets.QWidget):
         #
         self.pref = QtWidgets.QPushButton("Bookmarks")
         self.pref.setIcon(QtGui.QIcon("icons/bookmark.svg"))
+        self.pref.setIconSize(QtCore.QSize(menu_icon_size, menu_icon_size))
         self.pref.setFlat(True)
         #
         hpalette = self.palette().mid().color().name()
@@ -741,6 +742,7 @@ class menuWin(QtWidgets.QWidget):
                 continue
             btn = QtWidgets.QPushButton(el)
             btn.setIcon(QtGui.QIcon("icons/{}".format(el+".svg")))
+            btn.setIconSize(QtCore.QSize(menu_icon_size, menu_icon_size))
             btn.setFlat(True)
             ##########
             hpalette = self.palette().mid().color().name()

@@ -2,6 +2,8 @@
 bar_size=32
 # icon size
 icon_size=bar_size
+# menu category icon size
+menu_icon_size=24
 # use stalonetray as system tray: 0 no - 1 yes
 use_stalonetray = 0
 # the icon size in the tray
