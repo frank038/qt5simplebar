@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.4
+#### v 2.5
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -122,27 +122,27 @@ def on_pop_menu(app_dirs_user, app_dirs_system):
         cat = el[1]
         if cat == "Multimedia":
             # label - executable - icon - comment - path
-            Multimedia.append([el[0],el[2],el[3],el[4],el[5]])
+            Multimedia.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         elif cat == "Development":
-            Development.append([el[0],el[2],el[3],el[4],el[5]])
+            Development.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         elif cat == "Education":
-            Education.append([el[0],el[2],el[3],el[4],el[5]])
+            Education.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         elif cat == "Game":
-            Game.append([el[0],el[2],el[3],el[4],el[5]])
+            Game.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         elif cat == "Graphics":
-            Graphics.append([el[0],el[2],el[3],el[4],el[5]])
+            Graphics.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         elif cat == "Network":
-            Network.append([el[0],el[2],el[3],el[4],el[5]])
+            Network.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         elif cat == "Office":
-            Office.append([el[0],el[2],el[3],el[4],el[5]])
+            Office.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         elif cat == "Settings":
-            Settings.append([el[0],el[2],el[3],el[4],el[5]])
+            Settings.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         elif cat == "System":
-            System.append([el[0],el[2],el[3],el[4],el[5]])
+            System.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         elif cat == "Utility":
-            Utility.append([el[0],el[2],el[3],el[4],el[5]])
+            Utility.append([el[0],el[2],el[3],el[4],el[5],el[6]])
         else:
-            Other.append([el[0],el[2],el[3],el[4],el[5]])
+            Other.append([el[0],el[2],el[3],el[4],el[5],el[6]])
     #
     global menu_is_changed
     if menu_is_changed == 1:
@@ -834,6 +834,7 @@ class menuWin(QtWidgets.QWidget):
                 litem.exec_n = el[1]
                 litem.ppath = el[4]
                 litem.setToolTip(el[3])
+                litem.tterm = el[5]
                 self.listWidget.addItem(litem)
                 #
         self.listWidget.scrollToTop()
@@ -916,10 +917,27 @@ class menuWin(QtWidgets.QWidget):
         # self.p.setWorkingDirectory(os.getenv("HOME"))
         # # self.p.start(str(item.exec_n))
         # self.p.startDetached(str(item.exec_n))
-        if item.ppath:
-            os.system("cd {} && {} & cd {} &".format(str(item.ppath), str(item.exec_n), os.getenv("HOME")))
+        if item.tterm:
+            tterminal = None
+            try:
+                tterminal = os.environ['TERMINAL']
+            except KeyError as E:
+                if USER_TERMINAL:
+                    tterminal = USER_TERMINAL
+                else:
+                    MyDialog("Error", "Terminal not found.", self)
+                    return
+            #
+            if tterminal:
+                try:
+                    os.system("cd {} && {} -e {} & cd {}".format(str(item.ppath), tterminal, str(item.exec_n), os.getenv("HOME")))
+                except Exception as E:
+                    MyDialog("Error", "Terminal error: {}.".format(str(E)), self)
         else:
-            os.system("cd {} && {} &".format(os.getenv("HOME"), str(item.exec_n)))
+            if item.ppath:
+                os.system("cd {} && {} & cd {} &".format(str(item.ppath), str(item.exec_n), os.getenv("HOME")))
+            else:
+                os.system("cd {} && {} &".format(os.getenv("HOME"), str(item.exec_n)))
         # close the menu window
         if self.window.mw_is_shown is not None:
             self.window.mw_is_shown.close()

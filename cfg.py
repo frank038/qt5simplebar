@@ -60,6 +60,8 @@ date_command=event_command
 DIALOGWIDTH=300
 # track screen resolution changes: 0 no - 1 yes
 SCRN_RES = 1
+# terminal to use: "" for the default one
+USER_TERMINAL=""
 #
 shutdown_command="shutdown -P now"
 #
