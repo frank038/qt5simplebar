@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.3
+#### v 2.4
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -673,8 +673,9 @@ class menuWin(QtWidgets.QWidget):
         self.itemBookmark = 0
         self.itemSearching = 1
         if len(text) == 0:
-            self.emulate_clicked(self.pref, 100)
-            self.pref.setChecked(True)
+            self.listWidget.clear()
+            # self.emulate_clicked(self.pref, 100)
+            # self.pref.setChecked(True)
         elif len(text) > 2:
             self.listWidget.clear()
             app_list = ["Development", "Education","Game",
@@ -961,12 +962,13 @@ class menuWin(QtWidgets.QWidget):
             exe_path = sh_which(EXEC.split(" ")[0])
             file_info = QtCore.QFileInfo(exe_path)
             if file_info.exists():
-                if os.path.exists(ICON):
-                    icon = QtGui.QIcon(ICON)
-                else:
-                    icon = QtGui.QIcon.fromTheme(ICON)
-                    if icon.name() == "none":
-                        icon = QtGui.QIcon("icons/none.svg")
+                # if os.path.exists(ICON):
+                    # icon = QtGui.QIcon(ICON)
+                # else:
+                    # icon = QtGui.QIcon.fromTheme(ICON)
+                    # if icon.name() == "none":
+                        # icon = QtGui.QIcon("icons/none.svg")
+                icon = QtGui.QIcon.fromTheme(ICON, QtGui.QIcon("icons/none.svg"))
                 litem = QtWidgets.QListWidgetItem(icon, NAME)
                 litem.exec_n = EXEC
                 litem.setToolTip(TOOLTIP)
