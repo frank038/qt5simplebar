@@ -1,6 +1,6 @@
 # qt5simplebar
 
-Version 2.4
+Version 2.5
 
 A simple dock with menu and calendar.
 
