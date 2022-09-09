@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.5
+#### v 2.6
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -723,6 +723,7 @@ class menuWin(QtWidgets.QWidget):
                             litem.exec_n = el[1]
                             litem.ppath = el[4]
                             litem.setToolTip(el[3])
+                            litem.tterm = el[5]
                             self.listWidget.addItem(litem)
                             #
                     self.listWidget.scrollToTop()
@@ -858,15 +859,18 @@ class menuWin(QtWidgets.QWidget):
         if pret == 1 and action == item_b:
             item_idx = self.listWidget.indexAt(QPos)
             _item = self.listWidget.itemFromIndex(item_idx)
+            if _item == None:
+                return
             # 
             new_book = str(int(time.time()))
             icon_name = _item.picon
-            # ICON - NAME - EXEC - TOOLTIP - PATH
+            # ICON - NAME - EXEC - TOOLTIP - PATH - TERMINAL
             new_book_content = """{0}
 {1}
 {2}
 {3}
-{4}""".format(icon_name, _item.text(), _item.exec_n, _item.toolTip() or _item.text(), _item.ppath)
+{4}
+{5}""".format(icon_name, _item.text(), _item.exec_n, _item.toolTip() or _item.text(), _item.ppath, str(_item.tterm))
             with open(os.path.join("bookmarks", new_book), "w") as fbook:
                 fbook.write(new_book_content)
         # send to the Desktop action
@@ -876,6 +880,7 @@ class menuWin(QtWidgets.QWidget):
             item_name = _item.text()
             item_icon = _item.picon
             item_exec = _item.exec_n
+            item_term = _item.tterm
             # create a desktop file
             dest_file = os.path.join(os.path.expanduser("~"), DESKTOP_NAME, item_name)
             with open(dest_file+".desktop", "w") as ff:
@@ -884,6 +889,7 @@ class menuWin(QtWidgets.QWidget):
                 ff.write("Name={}\n".format(item_name))
                 ff.write("Exec={}\n".format(item_exec))
                 ff.write("Icon={}\n".format(item_icon))
+                ff.write("Terminal={}\n".format(item_term))
         #
         self.listWidget.clearSelection()
         self.listWidget.clearFocus()
@@ -962,20 +968,24 @@ class menuWin(QtWidgets.QWidget):
                 cnt.append(bb)
                 prog_list.append(cnt)
         # populate listWidget
+        # ICON - NAME - EXEC - TOOLTIP - PATH - TERMINAL
         for el in prog_list:
             ICON = el[0].strip("\n")
             NAME = el[1].strip("\n")
             EXEC = el[2].strip("\n")
             TOOLTIP = el[3].strip("\n")
-            # compatibility with previous this program versions
-            if len(el) > 5:
-                PATH_TEMP = el[4].strip("\n")
-                FILENAME = el[5].strip("\n")
-                if PATH_TEMP:
-                    PATH = PATH_TEMP
-            else:
-                FILENAME = el[4].strip("\n")
-                PATH = ""
+            PATH = el[4].strip("\n")
+            TTERM = el[5].strip("\n")
+            FILENAME = el[6].strip("\n")
+            # # 
+            # if len(el) > 5:
+                # PATH_TEMP = el[4].strip("\n")
+                # FILENAME = el[5].strip("\n")
+                # if PATH_TEMP:
+                    # PATH = PATH_TEMP
+            # else:
+                # FILENAME = el[4].strip("\n")
+                # PATH = ""
             #
             exe_path = sh_which(EXEC.split(" ")[0])
             file_info = QtCore.QFileInfo(exe_path)
@@ -992,6 +1002,10 @@ class menuWin(QtWidgets.QWidget):
                 litem.setToolTip(TOOLTIP)
                 litem.file_name = FILENAME
                 litem.ppath = PATH
+                if TTERM == "True":
+                    litem.tterm = True
+                else:
+                    litem.tterm = False
                 self.listWidget.addItem(litem)
                 #
         self.listWidget.sortItems(QtCore.Qt.AscendingOrder)
