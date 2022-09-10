@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.6
+#### v 2.7
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -925,16 +925,18 @@ class menuWin(QtWidgets.QWidget):
         # self.p.startDetached(str(item.exec_n))
         if item.tterm:
             tterminal = None
-            try:
-                tterminal = os.environ['TERMINAL']
-            except KeyError as E:
-                if USER_TERMINAL:
-                    tterminal = USER_TERMINAL
-                else:
-                    MyDialog("Error", "Terminal not found.", self)
-                    return
+            if USER_TERMINAL:
+                tterminal = USER_TERMINAL
+            else:
+                try:
+                    tterminal = os.environ['TERMINAL']
+                except KeyError:
+                    pass
             #
-            if tterminal:
+            if not tterminal or not sh_which(tterminal):
+                MyDialog("Error", "Terminal not found or not setted.", self)
+                return
+            else:
                 try:
                     os.system("cd {} && {} -e {} & cd {}".format(str(item.ppath), tterminal, str(item.exec_n), os.getenv("HOME")))
                 except Exception as E:
