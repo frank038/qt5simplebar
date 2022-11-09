@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.7
+#### v 2.8
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -88,7 +88,8 @@ Utility = []
 Other = []
 
 # the dirs of the application files
-app_dirs_user = [os.path.expanduser("~")+"/.local/share/applications"]
+# only one directory for user
+app_dirs_user = [os.path.join(os.path.expanduser("~"), ".local/share/applications")]
 app_dirs_system = ["/usr/share/applications", "/usr/local/share/applications"]
 
 # populate the menu
@@ -117,32 +118,36 @@ def on_pop_menu(app_dirs_user, app_dirs_system):
     global Other
     Other = []
     #
-    menu = getMenu(app_dirs_user, app_dirs_system).retList()
+    menu_prog = 0
+    if app_prog:
+        menu_prog = 1
+    menu_app = getMenu(app_dirs_user, app_dirs_system, menu_prog)
+    menu = menu_app.list_one
     for el in menu:
         cat = el[1]
         if cat == "Multimedia":
-            # label - executable - icon - comment - path
-            Multimedia.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            # label - executable - icon - comment - path - terminal - file full path
+            Multimedia.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         elif cat == "Development":
-            Development.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            Development.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         elif cat == "Education":
-            Education.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            Education.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         elif cat == "Game":
-            Game.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            Game.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         elif cat == "Graphics":
-            Graphics.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            Graphics.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         elif cat == "Network":
-            Network.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            Network.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         elif cat == "Office":
-            Office.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            Office.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         elif cat == "Settings":
-            Settings.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            Settings.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         elif cat == "System":
-            System.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            System.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         elif cat == "Utility":
-            Utility.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            Utility.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
         else:
-            Other.append([el[0],el[2],el[3],el[4],el[5],el[6]])
+            Other.append([el[0],el[2],el[3],el[4],el[5],el[6],el[7]])
     #
     global menu_is_changed
     if menu_is_changed == 1:
@@ -202,9 +207,9 @@ class MyDialog(QtWidgets.QMessageBox):
         elif args[0] == "Question":
             self.setIcon(QtWidgets.QMessageBox.Question)
             self.setStandardButtons(QtWidgets.QMessageBox.Ok|QtWidgets.QMessageBox.Cancel)
-        # self.setWindowIcon(QtGui.QIcon("icons/file-manager-red.svg"))
+        # self.setWindowIcon(QtGui.QIcon("icons/dialog-red.svg"))
         self.setWindowTitle(args[0])
-        self.resize(DIALOGWIDTH,300)
+        self.resize(DIALOGWIDTH,100)
         self.setText(args[1])
         retval = self.exec_()
     
@@ -547,13 +552,19 @@ class menuWin(QtWidgets.QWidget):
         ###########
         self.line_edit = QtWidgets.QLineEdit("")
         self.line_edit.setFrame(True)
-        # self.line_edit.setStyleSheet("color: black; background-color: white")
+        if search_field_bg:
+            if with_compositor:
+                # self.line_edit.setStyleSheet("color: black; background-color: white")
+                self.line_edit.setStyleSheet("padding: 4px; border-radius: 6px; background-color: {}".format(search_field_bg))
+            else:
+                self.line_edit.setStyleSheet("background-color: {}".format(search_field_bg))
+        #
         self.line_edit.textChanged.connect(self.on_line_edit)
         self.line_edit.setClearButtonEnabled(True)
         self.lbox.addWidget(self.line_edit)
         # self.line_edit.setFocus(True)
         self.listWidget.setFocus(True)
-        
+        self.listWidget.setIconSize(QtCore.QSize(menu_app_icon_size, menu_app_icon_size))
         ##### right box
         self.rbox = QtWidgets.QVBoxLayout()
         self.rbox.setContentsMargins(0,0,0,0)
@@ -611,6 +622,22 @@ class menuWin(QtWidgets.QWidget):
         #
         self.rbox.addStretch(1)
         #
+        ##### buttons
+        self.btn_box = QtWidgets.QHBoxLayout()
+        self.rbox.addLayout(self.btn_box)
+        ## add custom applications
+        if app_prog:
+            self.menu_btn = QtWidgets.QPushButton()
+            self.menu_btn.setIcon(QtGui.QIcon("icons/menu.png"))
+            self.menu_btn.setIconSize(QtCore.QSize(service_icon_size, service_icon_size))
+            self.menu_btn.setFlat(False)
+            #
+            if with_compositor:
+                self.menu_btn.setFlat(True)
+                self.menu_btn.setStyleSheet("padding: 2px; border: 1px solid {}; border-radius: 8px;".format(service_border_color))
+            self.menu_btn.clicked.connect(self.f_appWin)
+            self.btn_box.addWidget(self.menu_btn)
+        #
         self.show()
         #
         if self.window.cw_is_shown:
@@ -643,6 +670,11 @@ class menuWin(QtWidgets.QWidget):
                 self.window.mw_is_shown = None
                 return True
         return False
+    
+    #
+    def f_appWin(self):
+        os.system("{} &".format(app_prog))
+        self.close()
     
     # button category clicked
     def itemClicked(self, QPos):
@@ -724,6 +756,7 @@ class menuWin(QtWidgets.QWidget):
                             litem.ppath = el[4]
                             litem.setToolTip(el[3])
                             litem.tterm = el[5]
+                            litem.fpath = el[6]
                             self.listWidget.addItem(litem)
                             #
                     self.listWidget.scrollToTop()
@@ -836,6 +869,7 @@ class menuWin(QtWidgets.QWidget):
                 litem.ppath = el[4]
                 litem.setToolTip(el[3])
                 litem.tterm = el[5]
+                litem.fpath = el[6]
                 self.listWidget.addItem(litem)
                 #
         self.listWidget.scrollToTop()
@@ -855,6 +889,11 @@ class menuWin(QtWidgets.QWidget):
             item_d = self.listMenu.addAction("Send to the {}".format(DESKTOP_NAME))
         else:
             item_d = "None"
+        if app_mod_prog:
+            item_m = self.listMenu.addAction("Modify")
+        else:
+            item_m = "None"
+        #
         action = self.listMenu.exec_(self.listWidget.mapToGlobal(QPos))
         if pret == 1 and action == item_b:
             item_idx = self.listWidget.indexAt(QPos)
@@ -890,6 +929,13 @@ class menuWin(QtWidgets.QWidget):
                 ff.write("Exec={}\n".format(item_exec))
                 ff.write("Icon={}\n".format(item_icon))
                 ff.write("Terminal={}\n".format(item_term))
+        # modify action
+        elif action == item_m:
+            item_idx = self.listWidget.indexAt(QPos)
+            _item = self.listWidget.itemFromIndex(item_idx)
+            # item desktop file full path
+            item_fpath = _item.fpath
+            os.system("{} {} &".format(app_prog, item_fpath))
         #
         self.listWidget.clearSelection()
         self.listWidget.clearFocus()
@@ -963,6 +1009,7 @@ class menuWin(QtWidgets.QWidget):
         # self.line_edit.clear()
         bookmark_files = os.listdir("bookmarks")
         prog_list = []
+        #
         for bb in bookmark_files:
             with open(os.path.join("bookmarks",bb), "r") as fbook:
                 cnt = fbook.readlines()
@@ -1580,15 +1627,15 @@ if __name__ == '__main__':
     if icon_theme:
         QtGui.QIcon.setThemeName(icon_theme)
     
+    def on_directory_changed():
+        on_pop_menu(app_dirs_user, app_dirs_system)
+    
     # some applications has been added or removed
     def directory_changed(edir):
         global menu_is_changed
         menu_is_changed += 1
         if menu_is_changed == 1:
             on_directory_changed()
-    
-    def on_directory_changed():
-        on_pop_menu(app_dirs_system, app_dirs_user)
     
     # check for changes in the application directories
     fPath = app_dirs_system + app_dirs_user

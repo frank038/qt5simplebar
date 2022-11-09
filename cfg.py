@@ -3,9 +3,21 @@ bar_size=32
 # icon size
 icon_size=bar_size
 # menu category icon size
-menu_icon_size=24
+menu_icon_size=36
+# app icon size
+menu_app_icon_size=36
+# service menu icon size
+service_icon_size=20
+# service menu border colour
+service_border_color="gray"
+# program used to add applications OR "" - full path
+app_prog="./appmenu.py"
+# program used to modify a desktop file OR ""
+app_mod_prog=app_prog
+# search field background colour: colour (in the form "#xxxxxx") OR ""
+search_field_bg="#D6D3D3"
 # use stalonetray as system tray: 0 no - 1 yes
-use_stalonetray = 0
+use_stalonetray=0
 # the icon size in the tray
 tray_icon_size = bar_size
 # from right to left
@@ -21,18 +33,18 @@ border_radius=15
 # shadow blur radius
 blur_radius=15
 # theme style: "" to use the default theme
-theme_style="Fusion"
+theme_style=""
 # icon theme: "" to use the default theme
 icon_theme=""
 # in the form "#XXXXXX" or "rgb(X, X, X)" or "colour name"
 scroll_handle_col="#B5B5B5"
-# highlight color - in the form "#rrggbb or "" for default
+# highlight color - in the form "#rrggbb or "" for default #DF5E0B
 item_highlight_color="#B5B5B5"
 # show the name of the day: 0 no - 1 yes
 day_name=1
 # time in AM/PM format: 0 no - 1 yes
 USE_AP = 0
-# the calendar to read
+# the calendar ics file to read or leave "" empty
 calendar_file=""
 # in the form "#XXXXXX" or "colour name"
 calendar_appointment_day_color="#00AA00"
