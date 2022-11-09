@@ -51,6 +51,8 @@ calendar_appointment_day_color="#00AA00"
 # in the form "#XXXXXX" or "colour name"
 appointment_border_color="gray"
 #
+appointment_border_radius="15"
+#
 appointment_window_size=400
 # font to be used in the label
 calendar_label_font=""

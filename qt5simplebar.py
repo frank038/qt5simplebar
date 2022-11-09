@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.8
+#### v 2.8.1
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -1344,9 +1344,9 @@ class Calendar(QtWidgets.QCalendarWidget):
                 label.setWordWrap(True)
                 label.setStyleSheet(""" QLabel {0}
                       border: 3px solid;                                                                                                            
-                      border-radius: 18%;
-                      border-color: {1}; {2}                                                                                                                
-                      """.format("{", appointment_border_color, "}")) 
+                      border-radius: {1}px;
+                      border-color: {2}; {3}                                                                                                                
+                      """.format("{", appointment_border_radius, appointment_border_color, "}")) 
                 label.setToolTip(item[2])
                 self.cvbox.addWidget(label)
     
