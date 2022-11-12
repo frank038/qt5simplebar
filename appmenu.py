@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 0.8
+#### v 0.9
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os
 from cfg import DIALOGWIDTH
@@ -147,6 +147,18 @@ class appWin(QtWidgets.QWidget):
             if ret.getValue() == 0:
                 return
         #
+        mime_types = ""
+        mime_types = self.le_mime.text()
+        if mime_types:
+            if not mime_types[-1] == ";":
+                mime_types += ";"
+        #
+        key_words = ""
+        key_words = self.le_keys.text()
+        if key_words:
+            if not key_words[-1] == ";":
+                key_words += ";"
+        #
         f_content="""[Desktop Entry]
 Type=Application
 Version=1.0
@@ -163,7 +175,7 @@ Comment={}
 Terminal={}
 NoDisplay={}
 Hidden={}
-""".format(self.le_name.text(), self.le_gen_name.text(), self.le_exec.text(), self.le_exec_try.text(), self.le_path.text(), self.combo_categ.currentText(), self.le_mime.text(), self.le_keys.text(), self.le_icon.text(), self.le_comment.text(), str(self.chk_term.isChecked()).lower(), str(self.chk_disp.isChecked()).lower(), str(self.chk_hidd.isChecked()).lower())
+""".format(self.le_name.text(), self.le_gen_name.text(), self.le_exec.text(), self.le_exec_try.text(), self.le_path.text(), self.combo_categ.currentText(), mime_types, key_words, self.le_icon.text(), self.le_comment.text(), str(self.chk_term.isChecked()).lower(), str(self.chk_disp.isChecked()).lower(), str(self.chk_hidd.isChecked()).lower())
         #
         try:
             ffile = open(file_name_path, "w")
