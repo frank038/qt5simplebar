@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 0.7
+#### v 0.8
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os
 from cfg import DIALOGWIDTH
@@ -180,6 +180,7 @@ Hidden={}
     
     def f_modify(self):
         file_content = None
+        #
         with open(self.file_name, "r") as ffile:
             file_content = ffile.readlines()
         #
@@ -280,7 +281,11 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     if len(sys.argv) > 1:
         if sys.argv[1]:
-            window = appWin(sys.argv[1])
+            if not os.path.exists(sys.argv[1]):
+                MyDialog("Error", "The desktop file doesn't exist.", None)
+                sys.exit()
+            else:
+                window = appWin(sys.argv[1])
     else:
         window = appWin()
     sys.exit(app.exec_())
