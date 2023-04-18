@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#### v 2.8.1
+#### v 2.8.4
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -458,8 +458,8 @@ class menuWin(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(menuWin, self).__init__(parent)
         self.window = window
-        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool)
-        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
+        # self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
         ####### 
         self.mainBox = QtWidgets.QHBoxLayout()
         self.setLayout(self.mainBox)
