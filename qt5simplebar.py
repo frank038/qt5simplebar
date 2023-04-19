@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-#### v 2.8.4
+
+#### v 2.8.5
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
 from shutil import which as sh_which
@@ -368,10 +370,11 @@ class MainWin(QtWidgets.QMainWindow):
     
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
-        pix = QtGui.QPixmap("icons/left.png")
-        painter.drawPixmap(0,0, pix)
-        pix = QtGui.QPixmap("icons/right.png")
-        painter.drawPixmap(WINW-10,0, pix)
+        if CORNER_IMG:
+            pix = QtGui.QPixmap("icons/left.png")
+            painter.drawPixmap(0,0, pix)
+            pix = QtGui.QPixmap("icons/right.png")
+            painter.drawPixmap(WINW-10,0, pix)
         painter.end()
     
     

@@ -76,10 +76,12 @@ DIALOGWIDTH=300
 SCRN_RES = 1
 # terminal to use: "" for the default one
 USER_TERMINAL=""
+# use corner images: 0 no - 1 yes
+CORNER_IMG=1
 #
-shutdown_command="shutdown -P now"
+shutdown_command="/usr/bin/systemctl poweroff"
 #
-restart_command="reboot"
+restart_command="/usr/bin/systemctl reboot"
 #
 logout_command=""
 ### custom commands
