@@ -834,9 +834,7 @@ class menuWin(QtWidgets.QWidget):
         # 
         for el in cat_list:
             # 0 name - 1 executable - 2 icon - 3 comment - 4 path
-            exe_path_tmp = sh_which(el[1].strip("\n").split(" ")[0])
-            if exe_path_tmp:
-                exe_path = exe_path_tmp.strip('"').strip("'")
+            exe_path = sh_which(el[1].split(" ")[0])
             # file_info = QtCore.QFileInfo(exe_path)
             #
             if exe_path:
