@@ -151,7 +151,7 @@ class getMenu():
                             # # if aargs in fexec:
                                 # # fexec = fexec.strip(aargs)
                         # fexec = fexec.split(" ")[0]
-                        fexec_temp = fexec.split(" ")
+                        fexec_temp = fexec.strip("'").strip('"').split(" ")
                         for targ in self.execArgs:
                             if targ in fexec_temp:
                                 fexec_temp.remove(targ)
