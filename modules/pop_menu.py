@@ -142,6 +142,8 @@ class getMenu():
                         # fname_lower = fname.lower()
                         # pexec (executable)
                         fexec = entry.getExec()
+                        if fexec[0] == '"':
+                            fexec = fexec.lstrip('"').rstrip('"')
                         if fexec[0:5] == "$HOME":
                             fexec = "~"+fexec[5:]
                         # check for arguments and remove them
@@ -151,7 +153,7 @@ class getMenu():
                             # # if aargs in fexec:
                                 # # fexec = fexec.strip(aargs)
                         # fexec = fexec.split(" ")[0]
-                        fexec_temp = fexec.strip("'").strip('"').split(" ")
+                        fexec_temp = fexec.split(" ")
                         for targ in self.execArgs:
                             if targ in fexec_temp:
                                 fexec_temp.remove(targ)
