@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import os, shutil
 from xdg import DesktopEntry
 # from xdg import IconTheme
 # to get the language
@@ -126,6 +126,12 @@ class getMenu():
                         ftype = entry.getType()
                         if ftype != "Application":
                             continue
+                        #
+                        ftry = entry.getTryExec()
+                        if ftry:
+                            if not shutil.which(ftry):
+                                continue
+                        #
                         hidden = entry.getHidden()
                         nodisplay = entry.getNoDisplay()
                         # do not show those marked as hidden or not to display
@@ -142,8 +148,8 @@ class getMenu():
                         # fname_lower = fname.lower()
                         # pexec (executable)
                         fexec = entry.getExec()
-                        if fexec[0] == '"':
-                            fexec = fexec.lstrip('"').rstrip('"')
+                        # if fexec[0] == '"':
+                            # fexec = fexec.lstrip('"').rstrip('"')
                         if fexec[0:5] == "$HOME":
                             fexec = "~"+fexec[5:]
                         # check for arguments and remove them
