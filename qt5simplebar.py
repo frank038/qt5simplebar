@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#### v 2.8.6
+#### v 2.8.7
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys, os, time
@@ -722,45 +722,45 @@ class menuWin(QtWidgets.QWidget):
                     continue
                 for el in globals()[ell]:
                     if (text.casefold() in el[1].casefold()) or (text.casefold() in el[3].casefold()):
-                        exe_path = sh_which(el[1].split(" ")[0])
+                        # exe_path = sh_which(el[1].split(" ")[0])
                         # file_info = QtCore.QFileInfo(exe_path)
-                        if exe_path:
-                            # search for the icon by executable
-                            icon = QtGui.QIcon.fromTheme(el[1])
+                        # if exe_path:
+                        # search for the icon by executable
+                        icon = QtGui.QIcon.fromTheme(el[1])
+                        if icon.isNull() or icon.name() == "":
+                            # set the icon by desktop file - not full path
+                            icon = QtGui.QIcon.fromTheme(el[2])
                             if icon.isNull() or icon.name() == "":
-                                # set the icon by desktop file - not full path
-                                icon = QtGui.QIcon.fromTheme(el[2])
-                                if icon.isNull() or icon.name() == "":
-                                    # set the icon by desktop file - full path
-                                    if os.path.exists(el[2]):
-                                        icon = QtGui.QIcon(el[2])
-                                        if icon.isNull():
-                                            # set a generic icon
-                                            icon = QtGui.QIcon("icons/none.svg")
-                                            litem = QtWidgets.QListWidgetItem(icon, el[0])
-                                            litem.picon = "none"
-                                        else:
-                                            litem = QtWidgets.QListWidgetItem(icon, el[0])
-                                            litem.picon = el[2]
-                                    else:
+                                # set the icon by desktop file - full path
+                                if os.path.exists(el[2]):
+                                    icon = QtGui.QIcon(el[2])
+                                    if icon.isNull():
                                         # set a generic icon
                                         icon = QtGui.QIcon("icons/none.svg")
                                         litem = QtWidgets.QListWidgetItem(icon, el[0])
                                         litem.picon = "none"
+                                    else:
+                                        litem = QtWidgets.QListWidgetItem(icon, el[0])
+                                        litem.picon = el[2]
                                 else:
+                                    # set a generic icon
+                                    icon = QtGui.QIcon("icons/none.svg")
                                     litem = QtWidgets.QListWidgetItem(icon, el[0])
-                                    litem.picon = icon.name()
+                                    litem.picon = "none"
                             else:
                                 litem = QtWidgets.QListWidgetItem(icon, el[0])
-                                litem.picon = el[1]
-                            
-                            # set the exec name as property
-                            litem.exec_n = el[1]
-                            litem.ppath = el[4]
-                            litem.setToolTip(el[3])
-                            litem.tterm = el[5]
-                            litem.fpath = el[6]
-                            self.listWidget.addItem(litem)
+                                litem.picon = icon.name()
+                        else:
+                            litem = QtWidgets.QListWidgetItem(icon, el[0])
+                            litem.picon = el[1]
+                        
+                        # set the exec name as property
+                        litem.exec_n = el[1]
+                        litem.ppath = el[4]
+                        litem.setToolTip(el[3])
+                        litem.tterm = el[5]
+                        litem.fpath = el[6]
+                        self.listWidget.addItem(litem)
                             #
                     self.listWidget.scrollToTop()
         else:
@@ -834,46 +834,46 @@ class menuWin(QtWidgets.QWidget):
         # 
         for el in cat_list:
             # 0 name - 1 executable - 2 icon - 3 comment - 4 path
-            exe_path = sh_which(el[1].split(" ")[0])
+            # exe_path = sh_which(el[1].split(" ")[0])
             # file_info = QtCore.QFileInfo(exe_path)
             #
-            if exe_path:
-                # search for the icon by executable
-                icon = QtGui.QIcon.fromTheme(el[1])
+            # if exe_path:
+            # search for the icon by executable
+            icon = QtGui.QIcon.fromTheme(el[1])
+            if icon.isNull() or icon.name() == "":
+                # set the icon by desktop file - not full path
+                icon = QtGui.QIcon.fromTheme(el[2])
                 if icon.isNull() or icon.name() == "":
-                    # set the icon by desktop file - not full path
-                    icon = QtGui.QIcon.fromTheme(el[2])
-                    if icon.isNull() or icon.name() == "":
-                        # set the icon by desktop file - full path
-                        if os.path.exists(el[2]):
-                            icon = QtGui.QIcon(el[2])
-                            if icon.isNull():
-                                # set a generic icon
-                                icon = QtGui.QIcon("icons/none.svg")
-                                litem = QtWidgets.QListWidgetItem(icon, el[0])
-                                litem.picon = "none"
-                            else:
-                                litem = QtWidgets.QListWidgetItem(icon, el[0])
-                                litem.picon = el[2]
-                        else:
+                    # set the icon by desktop file - full path
+                    if os.path.exists(el[2]):
+                        icon = QtGui.QIcon(el[2])
+                        if icon.isNull():
                             # set a generic icon
                             icon = QtGui.QIcon("icons/none.svg")
                             litem = QtWidgets.QListWidgetItem(icon, el[0])
                             litem.picon = "none"
+                        else:
+                            litem = QtWidgets.QListWidgetItem(icon, el[0])
+                            litem.picon = el[2]
                     else:
+                        # set a generic icon
+                        icon = QtGui.QIcon("icons/none.svg")
                         litem = QtWidgets.QListWidgetItem(icon, el[0])
-                        litem.picon = icon.name()
+                        litem.picon = "none"
                 else:
                     litem = QtWidgets.QListWidgetItem(icon, el[0])
-                    litem.picon = el[1]
-                
-                # set the exec name as property
-                litem.exec_n = el[1]
-                litem.ppath = el[4]
-                litem.setToolTip(el[3])
-                litem.tterm = el[5]
-                litem.fpath = el[6]
-                self.listWidget.addItem(litem)
+                    litem.picon = icon.name()
+            else:
+                litem = QtWidgets.QListWidgetItem(icon, el[0])
+                litem.picon = el[1]
+            
+            # set the exec name as property
+            litem.exec_n = el[1]
+            litem.ppath = el[4]
+            litem.setToolTip(el[3])
+            litem.tterm = el[5]
+            litem.fpath = el[6]
+            self.listWidget.addItem(litem)
                 #
         self.listWidget.scrollToTop()
         self.listWidget.setFocus(True)
@@ -1039,27 +1039,27 @@ class menuWin(QtWidgets.QWidget):
                 # FILENAME = el[4].strip("\n")
                 # PATH = ""
             #
-            exe_path = sh_which(EXEC.split(" ")[0])
-            file_info = QtCore.QFileInfo(exe_path)
-            if file_info.exists():
+            # exe_path = sh_which(EXEC.split(" ")[0])
+            # file_info = QtCore.QFileInfo(exe_path)
+            # if file_info.exists():
                 # if os.path.exists(ICON):
                     # icon = QtGui.QIcon(ICON)
                 # else:
                     # icon = QtGui.QIcon.fromTheme(ICON)
                     # if icon.name() == "none":
                         # icon = QtGui.QIcon("icons/none.svg")
-                icon = QtGui.QIcon.fromTheme(ICON, QtGui.QIcon("icons/none.svg"))
-                litem = QtWidgets.QListWidgetItem(icon, NAME)
-                litem.exec_n = EXEC
-                litem.setToolTip(TOOLTIP)
-                litem.file_name = FILENAME
-                litem.ppath = PATH
-                if TTERM == "True":
-                    litem.tterm = True
-                else:
-                    litem.tterm = False
-                self.listWidget.addItem(litem)
-                #
+            icon = QtGui.QIcon.fromTheme(ICON, QtGui.QIcon("icons/none.svg"))
+            litem = QtWidgets.QListWidgetItem(icon, NAME)
+            litem.exec_n = EXEC
+            litem.setToolTip(TOOLTIP)
+            litem.file_name = FILENAME
+            litem.ppath = PATH
+            if TTERM == "True":
+                litem.tterm = True
+            else:
+                litem.tterm = False
+            self.listWidget.addItem(litem)
+            #
         self.listWidget.sortItems(QtCore.Qt.AscendingOrder)
         self.listWidget.scrollToTop()
         if self.listWidget.count():
